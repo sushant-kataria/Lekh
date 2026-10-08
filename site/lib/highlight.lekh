@@ -1,0 +1,51 @@
+-- highlight.lekh: build-time syntax highlighting.
+-- Code is cut into tokens with one pattern, and each token is wrapped in a
+-- <span> with a short class name: k = keyword, t = type, s = text, c = comment,
+-- n = number, i = {interpolation} inside Lekh text. No JavaScript needed.
+use escape_html from "html"
+
+constant LEKH_WORDS be set of "ability", "add", "and", "as", "ask", "at", "be", "change", "changeable", "choice", "constant", "copy", "decrease", "div", "else", "empty", "expect", "fail", "false", "for", "from", "give", "if", "in", "increase", "is", "lend", "let", "list", "map", "mod", "not", "nothing", "of", "ok", "or", "otherwise", "problem", "record", "remove", "repeat", "run", "say", "share", "skip", "some", "stop", "to", "true", "try", "use", "when", "while", "with", "each", "gives", "given", "times", "where", "keep", "turn", "count", "find", "first", "any", "every", "sort", "combine", "into", "starting", "using", "descending", "by", "me", "my", "changes", "can", "test", "channel", "send", "receive", "close", "start", "wait", "seconds", "same", "time", "between", "contains", "starts", "ends", "then", "back", "take", "last", "range", "set", "maybe", "result", "end", "item", "new", "least", "most", "greater", "less", "than", "position", "number", "text", "truth", "anything"
+
+constant RUST_WORDS be set of "as", "break", "const", "continue", "crate", "else", "enum", "false", "fn", "for", "if", "impl", "in", "let", "loop", "match", "mod", "move", "mut", "pub", "ref", "return", "self", "Self", "static", "struct", "super", "trait", "true", "type", "unsafe", "use", "where", "while", "Some", "None", "Ok", "Err"
+
+constant SHELL_WORDS be set of "python3", "git", "cd", "lekh", "alias", "py"
+
+-- one pattern finds every token: text in quotes, a comment, a word, a number, spaces, or one other character
+to token_pattern comment as text gives text:
+    give back "\"(?:[^\"\\\\]|\\\\.)*\"?|" + comment + ".*|[A-Za-z_][A-Za-z_0-9]*|[0-9][0-9_.]*|\\s+|."
+
+to span css_class as text, raw as text gives text:
+    give back "<span class=\"{css_class}\">{escape_html of raw}</span>"
+
+-- Lekh text: also mark the {interpolations} inside it
+to lekh_string raw as text gives text:
+    let changeable out be escape_html of raw
+    for each part in unique of (find_all with raw, "[{{][^{{}]*}"):
+        change out to replace with out, escape_html of part, "</span><span class=\"i\">{escape_html of part}</span><span class=\"s\">"
+    give back "<span class=\"s\">{out}</span>"
+
+to classify token as text, language as text, comment as text gives text:
+    if token starts with "\"":
+        if language is "lekh": give back lekh_string of token
+        give back span with "s", token
+    if token starts with comment: give back span with "c", token
+    let first_letter be slice with token, 1, 1
+    if language is "lekh" and LEKH_WORDS contains token: give back span with "k", token
+    if language is "rust" and RUST_WORDS contains token: give back span with "k", token
+    if language is "bash" and SHELL_WORDS contains token: give back span with "k", token
+    if is_number of first_letter: give back span with "n", token
+    if (letter_code of first_letter) is between 65 and 90 and length of token is greater than 1:
+        give back span with "t", token
+    give back escape_html of token
+
+-- Highlight a whole block of code. Languages: lekh, rust, bash (others are just escaped).
+share to highlight code as text, language as text gives text:
+    if language is not "lekh" and language is not "rust" and language is not "bash":
+        give back escape_html of code
+    let comment be if language is "lekh" then "--" otherwise if language is "rust" then "//" otherwise "#"
+    let pattern be token_pattern of comment
+    let changeable out be empty list
+    for each line in split with code, "\n":
+        let pieces be turn each token in (find_all with line, pattern) into classify with token, language, comment
+        add join with pieces, "" to out
+    give back join with out, "\n"

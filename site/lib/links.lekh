@@ -1,0 +1,96 @@
+-- links.lekh: the pieces of the website's link checker.
+--
+-- A link is fine when the file it points at exists in the built site and,
+-- when it has a #part, that page has an element with that id. Links to
+-- other websites are not followed. Links that start with "/" are reported:
+-- the site lives at /Lekh/ on GitHub Pages, so every link must be relative.
+
+-- every file under `folder`, as paths relative to it ("learn/01-install.html")
+share to files_under folder as text gives list of text:
+    let changeable found be empty list
+    for each name in (list_folder of folder) or else (empty list):
+        let full be join_path with folder, name
+        if is_folder of full:
+            for each inner in files_under of full:
+                add "{name}/{inner}" to found
+        otherwise:
+            add name to found
+    give back found
+
+-- "learn/../a/./b.html" -> "a/b.html"; a ".." above the top gives back nothing
+share to tidy_path path as text gives maybe text:
+    let changeable parts be empty list
+    for each piece in split with path, "/":
+        if piece is "" or piece is ".": skip
+        if piece is "..":
+            if length of parts is 0: give back nothing
+            let dropped be take last from parts
+            skip
+        add piece to parts
+    give back some (join with parts, "/")
+
+-- is this a link we don't check (another website, mail, an inline picture)?
+share to is_outside url as text gives truth:
+    for each start in list of "http://", "https://", "mailto:", "data:", "tel:", "javascript:":
+        if url starts with start: give back true
+    give back false
+
+-- the target of a link found in `page`, both relative to the site folder:
+-- ok "learn/01-install.html#install" , or a problem saying what's wrong
+share to resolve_link page as text, url as text gives result of text or text:
+    let clean be replace with url, "&amp;", "&"
+    if clean starts with "/": give back problem "starts with \"/\" (links must be relative so the site works under /Lekh/)"
+    let bits be split with clean, "#"
+    let path_part be item 1 of bits
+    let anchor be if length of bits is greater than 1 then "#" + item 2 of bits otherwise ""
+    let path_only be item 1 of (split with path_part, "?")
+    if path_only is "": give back ok page + anchor
+    let here be folder_of of page
+    let joined be if here is "" then path_only otherwise "{here}/{path_only}"
+    when tidy_path of joined:
+        is some tidy:
+            let target be if path_only ends with "/" or tidy is "" then (if tidy is "" then "index.html" otherwise "{tidy}/index.html") otherwise tidy
+            give back ok target + anchor
+        is nothing: give back problem "goes above the top of the site"
+
+-- the ids on a page (what #anchors can point at)
+share to ids_in html as text gives set of text:
+    let changeable ids be empty set
+    for each group in find_groups with html, "\\sid=\"([^\"]*)\"":
+        add first of group to ids
+    give back ids
+
+-- the links on a page: every href="..." and src="..."
+share to links_in html as text gives list of text:
+    give back turn each group in (find_groups with html, "\\s(?:href|src)=\"([^\"]*)\"") into first of group
+
+-- check a whole built site; gives back one line per problem
+share to check_site folder as text gives list of text:
+    let all_files be files_under of folder
+    let changeable known be empty set
+    for each f in all_files:
+        add f to known
+    let pages be keep each f in all_files where f ends with ".html"
+    let changeable ids be map of "" to (empty set)
+    for each page in pages:
+        let html be (read_file of (join_path with folder, page)) or else ""
+        change ids at page to ids_in of html
+    let changeable problems be empty list
+    for each page in pages:
+        let html be (read_file of (join_path with folder, page)) or else ""
+        for each url in links_in of html:
+            if is_outside of url: skip
+            when resolve_link with page, url:
+                is problem why: add "{page}: \"{url}\" {why}" to problems
+                is ok target:
+                    let bits be split with target, "#"
+                    let file be item 1 of bits
+                    let file_or_index be if (known contains file) or not (known contains "{file}/index.html") then file otherwise "{file}/index.html"
+                    if not (known contains file_or_index):
+                        add "{page}: \"{url}\" points at {file_or_index}, which isn't in the site" to problems
+                    otherwise if length of bits is greater than 1 and item 2 of bits is not "":
+                        let wanted be item 2 of bits
+                        let page_ids be (ids at file_or_index) or else (empty set)
+                        if not (page_ids contains wanted):
+                            add "{page}: \"{url}\" points at #{wanted}, which isn't on {file_or_index}" to problems
+    give back problems

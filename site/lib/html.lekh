@@ -1,0 +1,25 @@
+-- html.lekh: small helpers for writing HTML safely.
+
+-- Turn text into HTML-safe text: & < > " become entities, so nothing in the
+-- text can be mistaken for a tag. Always escape text before putting it in a page.
+share to escape_html t as text gives text:
+    let a be replace with t, "&", "&amp;"
+    let b be replace with a, "<", "&lt;"
+    let c be replace with b, ">", "&gt;"
+    give back replace with c, "\"", "&quot;"
+
+-- <tag class="...">inner</tag>   (inner must already be HTML)
+share to element tag as text, css_class as text, inner as text gives text:
+    if css_class is "":
+        give back "<{tag}>{inner}</{tag}>"
+    give back "<{tag} class=\"{css_class}\">{inner}</{tag}>"
+
+-- a link; the address and the label are escaped here
+share to link_to href as text, label as text gives text:
+    give back "<a href=\"{escape_html of href}\">{escape_html of label}</a>"
+
+-- a heading id in the same style as GitHub: "Cleanup: `at the end`" -> "cleanup-at-the-end"
+share to slug_of heading as text gives text:
+    let plain be lowercase of (replace with heading, "`", "")
+    let kept be replace_pattern with plain, "[^a-z0-9 _-]", ""
+    give back replace with (trimmed of kept), " ", "-"

@@ -111,6 +111,6 @@ How to fix:
 ```
 
 Lending to a background job is refused too, because the job might outlive
-the code that lent it. See [safety.md](../safety.md#doing-things-at-the-same-time).
+the code that lent it. See [safety.md](../safety.md#8-doing-things-at-the-same-time).
 
 Next: [14. Modules, tests and tools](14-modules-tests-tools.md)

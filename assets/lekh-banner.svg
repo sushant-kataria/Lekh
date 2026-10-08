@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-label="Lekh: code that reads like a sentence">
+<title>Lekh: code that reads like a sentence</title>
+<defs>
+<style>@font-face { font-family: 'Inter'; src: url('fonts/Inter.ttf'); font-weight: 100 900; } @font-face { font-family: 'JetBrains Mono'; src: url('fonts/JetBrainsMono.ttf'); font-weight: 100 800; } text { font-family: 'Inter', system-ui, sans-serif; } .name { font-size: 124px; font-weight: 800; fill: #ffffff; letter-spacing: -5px; } .tag { font-size: 44px; font-weight: 650; fill: #e8eef0; letter-spacing: -1px; } .tag2 { fill: #5eead4; } .small { font-size: 21px; font-weight: 500; fill: #93a3ad; } .url { font-size: 21px; font-weight: 600; fill: #5eead4; } .code, .out, .file, .label { font-family: 'JetBrains Mono', ui-monospace, monospace; } .code { font-size: 17px; fill: #e6e9ee; } .out { font-size: 17px; fill: #c9d4dc; } .file { font-size: 15px; fill: #93a3ad; } .label { font-size: 12.5px; font-weight: 700; fill: #6f7f8a; letter-spacing: 1.5px; } .k { fill: #5eead4; font-weight: 700; } .s { fill: #fbbf77; } .i { fill: #f9a8d4; } .c { fill: #7d8794; font-style: italic; } .n { fill: #c4b5fd; } .t { fill: #93c5fd; }</style>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1418"/><stop offset="1" stop-color="#0e1116"/></linearGradient>
+<radialGradient id="glow" cx="0.18" cy="0.12" r="0.75"><stop offset="0" stop-color="#14b8a6" stop-opacity="0.30"/><stop offset="1" stop-color="#14b8a6" stop-opacity="0"/></radialGradient>
+<radialGradient id="glow2" cx="0.95" cy="1" r="0.6"><stop offset="0" stop-color="#ffd166" stop-opacity="0.10"/><stop offset="1" stop-color="#ffd166" stop-opacity="0"/></radialGradient>
+<pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="#ffffff" fill-opacity="0.05"/></pattern>
+<linearGradient id="logo-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#16b8a5"/><stop offset="1" stop-color="#0b6b63"/></linearGradient>
+<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000000" flood-opacity="0.45"/></filter>
+</defs>
+<rect width="1280" height="640" fill="url(#bg)"/><rect width="1280" height="640" fill="url(#dots)"/><rect width="1280" height="640" fill="url(#glow)"/><rect width="1280" height="640" fill="url(#glow2)"/>
+<g transform="translate(80 118) scale(1.6)"><rect width="64" height="64" rx="15" fill="url(#logo-bg)"/><path d="M14 17.5 H50" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/><path d="M27 17.5 C27 28 24.5 37 22.5 44.5 C21.8 47.5 23.4 49.6 26.6 49 C32 48 37 47.2 41 47" fill="none" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="49" cy="46.6" r="3.6" fill="#ffd166"/></g>
+<text x="72" y="335" class="name" xml:space="preserve">Lekh</text>
+<text x="80" y="400" class="tag" xml:space="preserve">Code that reads</text>
+<text x="80" y="454" class="tag">like a <tspan class="tag2">sentence</tspan><tspan fill="#ffd166">.</tspan></text>
+<text x="80" y="512" class="small" xml:space="preserve">Safe like Rust. Readable like English.</text>
+<text x="80" y="548" class="url" xml:space="preserve">sushant-kataria.github.io/Lekh</text>
+<g filter="url(#shadow)"><rect x="560" y="110" width="650" height="419" rx="18" fill="#12171d" stroke="#ffffff" stroke-opacity="0.08"/></g>
+<path d="M578 110 H1192 A18 18 0 0 1 1210 128 V158 H560 V128 A18 18 0 0 1 578 110 Z" fill="#1a2028"/>
+<line x1="560" y1="158" x2="1210" y2="158" stroke="#ffffff" stroke-opacity="0.07"/>
+<circle cx="584" cy="134" r="6.5" fill="#ff6b6b"/>
+<circle cx="606" cy="134" r="6.5" fill="#ffd166"/>
+<circle cx="628" cy="134" r="6.5" fill="#3ddc97"/>
+<text x="885" y="139" class="file" text-anchor="middle">palindrome.lekh</text>
+<text x="590" y="194" class="code" xml:space="preserve"><tspan class="k">to</tspan> palindrome word <tspan class="k">as</tspan> <tspan class="k">text</tspan> <tspan class="k">gives</tspan> <tspan class="k">truth</tspan>:</text>
+<text x="590" y="223" class="code" xml:space="preserve">    <tspan class="k">let</tspan> clean <tspan class="k">be</tspan> lowercase <tspan class="k">of</tspan> (replace <tspan class="k">with</tspan> word, <tspan class="s">&quot; &quot;</tspan>, <tspan class="s">&quot;&quot;</tspan>)</text>
+<text x="590" y="252" class="code" xml:space="preserve">    <tspan class="k">give</tspan> <tspan class="k">back</tspan> clean <tspan class="k">is</tspan> reversed <tspan class="k">of</tspan> clean</text>
+<text x="590" y="281" class="code" xml:space="preserve"></text>
+<text x="590" y="310" class="code" xml:space="preserve"><tspan class="k">for</tspan> <tspan class="k">each</tspan> word <tspan class="k">in</tspan> <tspan class="k">list</tspan> <tspan class="k">of</tspan> <tspan class="s">&quot;racecar&quot;</tspan>, <tspan class="s">&quot;Never odd or even&quot;</tspan>:</text>
+<text x="590" y="339" class="code" xml:space="preserve">    <tspan class="k">if</tspan> palindrome <tspan class="k">of</tspan> word:</text>
+<text x="590" y="368" class="code" xml:space="preserve">        <tspan class="k">say</tspan> <tspan class="s">&quot;</tspan><tspan class="i">{word}</tspan><tspan class="s"> is a palindrome&quot;</tspan></text>
+<line x1="590" y1="415" x2="1180" y2="415" stroke="#ffffff" stroke-opacity="0.08" stroke-dasharray="4 5"/>
+<text x="590" y="441" class="label" xml:space="preserve">OUTPUT</text>
+<text x="590" y="470" class="out" xml:space="preserve"><tspan fill="#3ddc97">› </tspan>racecar is a palindrome</text>
+<text x="590" y="499" class="out" xml:space="preserve"><tspan fill="#3ddc97">› </tspan>Never odd or even is a palindrome</text>
+</svg>

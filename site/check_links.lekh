@@ -1,0 +1,23 @@
+-- check_links.lekh: make sure no link in the built website is broken.
+--
+--   python3 lekh.py site/check_links.lekh             checks site/dist
+--   python3 lekh.py site/check_links.lekh some/dir    checks another folder
+--
+-- It looks at every href and src in every page, and every #anchor.
+-- Stops with exit code 1 when anything is wrong.
+use check_site, files_under from "lib/links"
+
+let folder be if length of arguments is greater than 0 then item 1 of arguments otherwise "site/dist"
+if not (is_folder of folder):
+    say "There is no folder called {folder}. Build the site first: python3 lekh.py site/build.lekh"
+    exit_program with 1
+
+let pages be keep each f in (files_under of folder) where f ends with ".html"
+let problems be check_site of folder
+if length of problems is 0:
+    say "All links are fine: checked {length of pages} pages in {folder}."
+otherwise:
+    for each line in problems:
+        say "  " + line
+    say "{length of problems} broken link(s) in {folder}."
+    exit_program with 1

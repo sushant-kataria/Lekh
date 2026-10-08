@@ -371,7 +371,7 @@ and tested (`python3 tests/run_tests.py`: 133 checks, covering 148 documentation
   with `try` propagation; `at the end` cleanup; English list operations.
 * **Stage 2, standard library:** files and folders, JSON, dates, maths, random, regular
   expressions, environment and arguments, stdin, shell-free commands, HTTP GET/POST, custom
-  sorting, sets, queues and stacks (127 built-in tasks in total).
+  sorting, sets, queues and stacks (128 built-in tasks in total).
 * **Stage 3, concurrency and tooling:** `at the same time`, parallel `for each`, channels, jobs,
   with no shared mutable state; `share` (private by default), projects and `lekh new`;
   `test`/`expect` and `lekh test`; `lekh format`; REPL history, `:vars`, `:type`, `:load`, `:reset`.

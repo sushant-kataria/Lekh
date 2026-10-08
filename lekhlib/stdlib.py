@@ -9,7 +9,7 @@ import fnmatch
 import functools
 import json
 import math
-import os
+import os, shutil
 import random
 import re
 import shlex
@@ -594,6 +594,21 @@ def b_list_folder(I, e, a):
     p = _path(I, e, a[0])
     try:
         return Ok(PList(sorted(os.listdir(p))))
+    except OSError as ex:
+        return _io_problem(ex, a[0])
+
+
+@builtin("copy_file", 2, 2, 'copy_file with "logo.png", "site/logo.png"   -> ok "site/logo.png"   (any kind of file; makes folders; replaces the copy)')
+def b_copy_file(I, e, a):
+    src, dst = _path(I, e, a[0]), _path(I, e, a[1])
+    if os.path.isdir(src):
+        return Problem("\"%s\" is a folder - copy_file copies single files" % a[0])
+    try:
+        folder = os.path.dirname(dst)
+        if folder:
+            os.makedirs(folder, exist_ok=True)
+        shutil.copyfile(src, dst)
+        return Ok(a[1])
     except OSError as ex:
         return _io_problem(ex, a[0])
 

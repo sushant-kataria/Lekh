@@ -1,0 +1,78 @@
+-- banner.lekh: draws assets/lekh-banner.svg, the picture at the top of the README
+-- (and the preview image when the project or website is shared).
+--
+--   python3 lekh.py site/banner.lekh             writes assets/lekh-banner.svg
+--   python3 tools/render_banner.py               turns it into assets/lekh-banner.png
+--
+-- The code in the picture is a real program (site/content/snippets/banner.lekh),
+-- coloured by the website's highlighter, and the output under it is what that
+-- program really prints: this program runs it.
+use highlight from "lib/highlight"
+
+constant SNIPPET be "site/content/snippets/banner.lekh"
+constant LINE_HEIGHT be 29
+
+-- the highlighter makes HTML <span>s; SVG wants <tspan>s
+to svg_line html as text gives text:
+    give back replace with (replace with html, "<span ", "<tspan "), "</span>", "</tspan>"
+
+to text_line x as number, y as number, kind as text, content as text gives text:
+    give back "<text x=\"{x}\" y=\"{y}\" class=\"{kind}\" xml:space=\"preserve\">{content}</text>"
+
+let code be trim_end of ((read_file of SNIPPET) or else "say \"Hello, world!\"")
+let python be (environment of "LEKH_PYTHON") or else "python3"
+let output be when_ok of (run_command of "{python} lekh.py run {SNIPPET}")
+
+to when_ok r as result of CommandOutput or text gives text:
+    when r:
+        is ok out: give back trim_end of out's output
+        is problem why: fail "Couldn't run the banner snippet: {why}"
+
+let changeable parts be empty list
+add "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1280\" height=\"640\" viewBox=\"0 0 1280 640\" role=\"img\" aria-label=\"Lekh: code that reads like a sentence\">" to parts
+add "<title>Lekh: code that reads like a sentence</title>" to parts
+add "<defs>" to parts
+add "<style>@font-face {{ font-family: 'Inter'; src: url('fonts/Inter.ttf'); font-weight: 100 900; }} @font-face {{ font-family: 'JetBrains Mono'; src: url('fonts/JetBrainsMono.ttf'); font-weight: 100 800; }} text {{ font-family: 'Inter', system-ui, sans-serif; }} .name {{ font-size: 124px; font-weight: 800; fill: #ffffff; letter-spacing: -5px; }} .tag {{ font-size: 44px; font-weight: 650; fill: #e8eef0; letter-spacing: -1px; }} .tag2 {{ fill: #5eead4; }} .small {{ font-size: 21px; font-weight: 500; fill: #93a3ad; }} .url {{ font-size: 21px; font-weight: 600; fill: #5eead4; }} .code, .out, .file, .label {{ font-family: 'JetBrains Mono', ui-monospace, monospace; }} .code {{ font-size: 17px; fill: #e6e9ee; }} .out {{ font-size: 17px; fill: #c9d4dc; }} .file {{ font-size: 15px; fill: #93a3ad; }} .label {{ font-size: 12.5px; font-weight: 700; fill: #6f7f8a; letter-spacing: 1.5px; }} .k {{ fill: #5eead4; font-weight: 700; }} .s {{ fill: #fbbf77; }} .i {{ fill: #f9a8d4; }} .c {{ fill: #7d8794; font-style: italic; }} .n {{ fill: #c4b5fd; }} .t {{ fill: #93c5fd; }}</style>" to parts
+add "<linearGradient id=\"bg\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#0b1418\"/><stop offset=\"1\" stop-color=\"#0e1116\"/></linearGradient>" to parts
+add "<radialGradient id=\"glow\" cx=\"0.18\" cy=\"0.12\" r=\"0.75\"><stop offset=\"0\" stop-color=\"#14b8a6\" stop-opacity=\"0.30\"/><stop offset=\"1\" stop-color=\"#14b8a6\" stop-opacity=\"0\"/></radialGradient>" to parts
+add "<radialGradient id=\"glow2\" cx=\"0.95\" cy=\"1\" r=\"0.6\"><stop offset=\"0\" stop-color=\"#ffd166\" stop-opacity=\"0.10\"/><stop offset=\"1\" stop-color=\"#ffd166\" stop-opacity=\"0\"/></radialGradient>" to parts
+add "<pattern id=\"dots\" width=\"28\" height=\"28\" patternUnits=\"userSpaceOnUse\"><circle cx=\"2\" cy=\"2\" r=\"1.2\" fill=\"#ffffff\" fill-opacity=\"0.05\"/></pattern>" to parts
+add "<linearGradient id=\"logo-bg\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#16b8a5\"/><stop offset=\"1\" stop-color=\"#0b6b63\"/></linearGradient>" to parts
+add "<filter id=\"shadow\" x=\"-10%\" y=\"-10%\" width=\"120%\" height=\"130%\"><feDropShadow dx=\"0\" dy=\"18\" stdDeviation=\"22\" flood-color=\"#000000\" flood-opacity=\"0.45\"/></filter>" to parts
+add "</defs>" to parts
+add "<rect width=\"1280\" height=\"640\" fill=\"url(#bg)\"/><rect width=\"1280\" height=\"640\" fill=\"url(#dots)\"/><rect width=\"1280\" height=\"640\" fill=\"url(#glow)\"/><rect width=\"1280\" height=\"640\" fill=\"url(#glow2)\"/>" to parts
+
+-- left: the logo, the name and the tagline
+add "<g transform=\"translate(80 118) scale(1.6)\"><rect width=\"64\" height=\"64\" rx=\"15\" fill=\"url(#logo-bg)\"/><path d=\"M14 17.5 H50\" stroke=\"#ffffff\" stroke-width=\"5\" stroke-linecap=\"round\"/><path d=\"M27 17.5 C27 28 24.5 37 22.5 44.5 C21.8 47.5 23.4 49.6 26.6 49 C32 48 37 47.2 41 47\" fill=\"none\" stroke=\"#ffffff\" stroke-width=\"5.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"49\" cy=\"46.6\" r=\"3.6\" fill=\"#ffd166\"/></g>" to parts
+add text_line with 72, 335, "name", "Lekh" to parts
+add text_line with 80, 400, "tag", "Code that reads" to parts
+add "<text x=\"80\" y=\"454\" class=\"tag\">like a <tspan class=\"tag2\">sentence</tspan><tspan fill=\"#ffd166\">.</tspan></text>" to parts
+add text_line with 80, 512, "small", "Safe like Rust. Readable like English." to parts
+add text_line with 80, 548, "url", "sushant-kataria.github.io/Lekh" to parts
+
+-- right: a code window with the program and what it printed
+let code_lines be split with code, "\n"
+let out_lines be split with output, "\n"
+let win_x be 560
+let win_w be 650
+let win_h be 84 + (length of code_lines) * LINE_HEIGHT + 40 + 34 + (length of out_lines) * LINE_HEIGHT
+let win_y be whole of ((640 - win_h) / 2)
+let code_top be win_y + 84
+let out_top be code_top + (length of code_lines) * LINE_HEIGHT + 40
+add "<g filter=\"url(#shadow)\"><rect x=\"{win_x}\" y=\"{win_y}\" width=\"{win_w}\" height=\"{win_h}\" rx=\"18\" fill=\"#12171d\" stroke=\"#ffffff\" stroke-opacity=\"0.08\"/></g>" to parts
+add "<path d=\"M{win_x + 18} {win_y} H{win_x + win_w - 18} A18 18 0 0 1 {win_x + win_w} {win_y + 18} V{win_y + 48} H{win_x} V{win_y + 18} A18 18 0 0 1 {win_x + 18} {win_y} Z\" fill=\"#1a2028\"/>" to parts
+add "<line x1=\"{win_x}\" y1=\"{win_y + 48}\" x2=\"{win_x + win_w}\" y2=\"{win_y + 48}\" stroke=\"#ffffff\" stroke-opacity=\"0.07\"/>" to parts
+for each (dx, colour) in list of (24, "#ff6b6b"), (46, "#ffd166"), (68, "#3ddc97"):
+    add "<circle cx=\"{win_x + dx}\" cy=\"{win_y + 24}\" r=\"6.5\" fill=\"{colour}\"/>" to parts
+add "<text x=\"{win_x + win_w / 2}\" y=\"{win_y + 29}\" class=\"file\" text-anchor=\"middle\">palindrome.lekh</text>" to parts
+for each line and pos in code_lines:
+    add text_line with win_x + 30, code_top + (pos - 1) * LINE_HEIGHT, "code", svg_line of (highlight with line, "lekh") to parts
+add "<line x1=\"{win_x + 30}\" y1=\"{out_top - 22}\" x2=\"{win_x + win_w - 30}\" y2=\"{out_top - 22}\" stroke=\"#ffffff\" stroke-opacity=\"0.08\" stroke-dasharray=\"4 5\"/>" to parts
+add text_line with win_x + 30, out_top + 4, "label", "OUTPUT" to parts
+for each line and pos in out_lines:
+    add "<text x=\"{win_x + 30}\" y=\"{out_top + 4 + pos * LINE_HEIGHT}\" class=\"out\" xml:space=\"preserve\"><tspan fill=\"#3ddc97\">› </tspan>{line}</text>" to parts
+add "</svg>" to parts
+
+when write_file with "assets/lekh-banner.svg", (join with parts, "\n") + "\n":
+    is ok n: say "Wrote assets/lekh-banner.svg ({length of code_lines} lines of code, {length of out_lines} of output)."
+    is problem why: fail "Couldn't write the banner: {why}"

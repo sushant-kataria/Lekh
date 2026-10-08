@@ -1317,6 +1317,7 @@ Paths are relative to the folder you run the program from.
 | `is_folder` | `is_folder of "src"` → true / false |
 | `list_folder` | `list_folder of "."` → ok ["a.txt", "src"] (sorted names) |
 | `make_folder` | `make_folder of "reports/2026"` → ok "reports/2026" (makes parents too) |
+| `copy_file` | `copy_file with "logo.png", "site/logo.png"` → ok "site/logo.png" (any kind of file; makes folders; replaces the copy) |
 | `delete_file` | `delete_file of "old.txt"` → ok "old.txt" (files only, never folders) |
 | `file_size` | `file_size of "photo.jpg"` → ok 20480 (bytes) |
 | `join_path` | `join_path with "reports", "june.csv"` → "reports/june.csv" (any number of parts) |
@@ -1336,6 +1337,7 @@ say file_exists of path
 say is_folder of folder
 say (list_folder of folder) or else (empty list)
 say (file_size of path) or else 0
+say (copy_file with path, join_path with folder, "backup", "data.txt") or else "?"
 say file_name of path
 say folder_of of path
 say extension of path
@@ -1354,6 +1356,7 @@ true
 true
 ["data.txt"]
 14
+ref_demo/backup/data.txt
 data.txt
 ref_demo
 txt

@@ -1,0 +1,13 @@
+record Account:
+    owner as text
+    balance as number
+
+to withdraw acc as Account, amount as number gives result of number:
+    if amount is greater than acc's balance:
+        give back problem "not enough money"
+    give back ok acc's balance - amount
+
+let mine be Account with owner "Asha", balance 100
+when withdraw with mine, 30:
+    is ok left: say "Left: {left}"
+    is problem why: say "Error: {why}"
