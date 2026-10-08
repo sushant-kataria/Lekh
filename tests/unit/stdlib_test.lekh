@@ -13,6 +13,15 @@ test "files":
     delete_file of path
     expect file_exists of path to be false
 
+test "copy_file copies any file and makes folders":
+    let src be "/tmp/lekh_unit_copy_src.txt"
+    let dst be "/tmp/lekh_unit_copy/deep/copy.txt"
+    write_file with src, "binary-safe?"
+    expect copy_file with src, dst to be ok
+    expect (read_file of dst) or else "" to be "binary-safe?"
+    expect copy_file with "/tmp/lekh_no_such_file_xyz", dst to be problem
+    expect copy_file with "/tmp", dst to be problem
+
 test "patterns":
     expect matches with "abc123", "[a-z]+[0-9]+" to be true
     expect find_all with "a1b2", "[0-9]" to be list of "1", "2"

@@ -12,7 +12,7 @@ safety rules of Rust: no crashes from missing values, no accidental sharing of d
 
 ```bash
 git clone https://github.com/sushant-kataria/Lekh.git
-cd lekh
+cd Lekh
 python3 lekh.py version
 ```
 

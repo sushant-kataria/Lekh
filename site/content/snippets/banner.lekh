@@ -1,0 +1,7 @@
+to palindrome word as text gives truth:
+    let clean be lowercase of (replace with word, " ", "")
+    give back clean is reversed of clean
+
+for each word in list of "racecar", "Never odd or even":
+    if palindrome of word:
+        say "{word} is a palindrome"

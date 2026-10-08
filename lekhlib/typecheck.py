@@ -144,7 +144,7 @@ SIGS = {
     "write_file": ([TEXT, ANY], RES(NUM, TEXT)), "append_file": ([TEXT, ANY], RES(NUM, TEXT)),
     "file_exists": ([TEXT], TRUTH), "is_folder": ([TEXT], TRUTH), "list_folder": ([TEXT], RES(L(TEXT), TEXT)),
     "make_folder": ([TEXT], RES(TEXT, TEXT)), "delete_file": ([TEXT], RES(TEXT, TEXT)), "file_size": ([TEXT], RES(NUM, TEXT)),
-    "join_path": ([TEXT, TEXT], TEXT), "file_name": ([TEXT], TEXT), "folder_of": ([TEXT], TEXT), "extension": ([TEXT], TEXT),
+    "join_path": ([TEXT, TEXT], TEXT), "copy_file": ([TEXT, TEXT], RES(TEXT, TEXT)), "file_name": ([TEXT], TEXT), "folder_of": ([TEXT], TEXT), "extension": ([TEXT], TEXT),
     "to_json": ([ANY, TRUTH], TEXT), "from_json": ([TEXT], RES(ANY, TEXT)), "json_get": ([ANY, TEXT], MAYBE(ANY)),
     "now": ([], NUM), "today": ([], TEXT), "current_time": ([], TEXT), "format_time": ([NUM, TEXT], TEXT),
     "parse_date": ([TEXT], RES(NUM, TEXT)), "add_days": ([NUM, NUM], NUM), "days_between": ([NUM, NUM], NUM),

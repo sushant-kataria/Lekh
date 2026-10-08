@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Lekh logo">
+  <title>Lekh</title>
+  <defs>
+    <linearGradient id="lekh-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#16b8a5"/>
+      <stop offset="1" stop-color="#0b6b63"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="url(#lekh-bg)"/>
+  <!-- the headline bar of Devanagari script (shirorekha) -->
+  <path d="M14 17.5 H50" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+  <!-- a pen stroke that hangs from the bar and runs along the line: an L -->
+  <path d="M27 17.5 C27 28 24.5 37 22.5 44.5 C21.8 47.5 23.4 49.6 26.6 49 C32 48 37 47.2 41 47" fill="none" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- the full stop: code that reads like a sentence -->
+  <circle cx="49" cy="46.6" r="3.6" fill="#ffd166"/>
+</svg>

@@ -1,0 +1,90 @@
+-- Tests for the website generator's building blocks (site/lib).
+--   python3 lekh.py test site/tests
+use escape_html, slug_of, link_to from "../lib/html"
+use highlight from "../lib/highlight"
+use render, inline from "../lib/markdown"
+use relative, prefix_for, logo_svg from "../lib/layout"
+use tidy_path, resolve_link, is_outside, ids_in, links_in, check_site, files_under from "../lib/links"
+
+test "escape_html makes text safe inside HTML":
+    expect escape_html of "a < b & \"c\" > d" to be "a &lt; b &amp; &quot;c&quot; &gt; d"
+
+test "slug_of turns a heading into an id":
+    expect slug_of of "8. Doing things at the same time" to be "8-doing-things-at-the-same-time"
+    expect slug_of of "What Lekh does *not* protect against" to be "what-lekh-does-not-protect-against"
+    expect slug_of of "`lend` and `give`" to be "lend-and-give"
+
+test "highlight marks Lekh keywords, strings, numbers and comments":
+    let html be highlight with "let n be 42 -- the answer", "lekh"
+    expect html contains "<span class=\"k\">let</span>" to be true
+    expect html contains "<span class=\"n\">42</span>" to be true
+    expect html contains "<span class=\"c\">-- the answer</span>" to be true
+
+test "highlight shows interpolation inside Lekh strings":
+    let html be highlight with "say \"Hi {{name}}!\"", "lekh"
+    expect html contains "<span class=\"i\">{{name}</span>" to be true
+    expect html contains "&quot;" to be true
+
+test "highlight knows Rust and the terminal, and escapes everything else":
+    expect (highlight with "fn main() {{}", "rust") contains "<span class=\"k\">fn</span>" to be true
+    expect (highlight with "ls # files", "bash") contains "<span class=\"c\"># files</span>" to be true
+    expect highlight with "<b>", "text" to be "&lt;b&gt;"
+
+test "markdown: headings get ids, and repeated headings get different ones":
+    let r be render with "# Title\n\n## Sets\n\n## Sets", given u: u
+    expect r's title to be "Title"
+    expect r's html contains "<h2 id=\"sets\">" to be true
+    expect r's html contains "<h2 id=\"sets-1\">" to be true
+    expect length of r's headings to be 2
+
+test "markdown: inline bold, italic, code and links (links go through the fixer)":
+    let html be inline with "*soft* **bold** `a < b` [go](x.md)", given u: "fixed/" + u
+    expect html to be "<em>soft</em> <strong>bold</strong> <code>a &lt; b</code> <a href=\"fixed/x.md\">go</a>"
+
+test "markdown: tables, lists, code blocks and output blocks":
+    let html be (render with "| A | B |\n|---|---|\n| 1 | 2 |\n\n1. one\n2. two\n\n- x\n\n```lekh\nsay 1\n```\n\n```output\n1\n```", given u: u)'s html
+    expect html contains "<th>A</th><th>B</th>" to be true
+    expect html contains "<td>1</td><td>2</td>" to be true
+    expect html contains "<ol><li>one</li><li>two</li></ol>" to be true
+    expect html contains "<ul><li>x</li></ul>" to be true
+    expect html contains "<div class=\"code\"><div class=\"code-label\">Lekh</div>" to be true
+    expect html contains "<div class=\"code output\"><div class=\"code-label\">Output</div><pre>1</pre>" to be true
+
+test "layout: links between pages are relative (the site lives under /Lekh/)":
+    expect relative with "learn/01-install.html", "index.html" to be "../index.html"
+    expect relative with "index.html", "learn/01-install.html" to be "learn/01-install.html"
+    expect prefix_for of "a/b/c.html" to be "../../"
+    expect prefix_for of "index.html" to be ""
+
+test "layout: two logos on one page don't share gradient ids":
+    expect (logo_svg with 22, "one") contains "id=\"logo-one\"" to be true
+    expect (logo_svg with 22, "two") contains "url(#logo-two)" to be true
+
+test "links: paths are tidied, and can't climb above the site":
+    expect tidy_path of "learn/../a/./b.html" to be some "a/b.html"
+    expect tidy_path of "../x.html" to be nothing
+
+test "links: resolving a link from a page":
+    expect resolve_link with "learn/01.html", "../index.html#top" to be ok "index.html#top"
+    expect resolve_link with "learn/01.html", "#here" to be ok "learn/01.html#here"
+    expect resolve_link with "index.html", "learn/" to be ok "learn/index.html"
+    expect resolve_link with "index.html", "/style.css" to be problem
+    expect is_outside of "https://github.com" to be true
+    expect is_outside of "style.css" to be false
+
+test "links: finding ids and links in a page":
+    let html be "<a href=\"a.html\">a</a> <img src=\"p.png\" alt=\"\"> <h2 id=\"one\">x</h2>"
+    expect links_in of html to be list of "a.html", "p.png"
+    expect ids_in of html contains "one" to be true
+
+test "links: a whole site, with one good and three broken links":
+    let dir be "/tmp/lekh_site_links_test"
+    make_folder of "{dir}/learn"
+    write_file with "{dir}/index.html", "<a href=\"learn/a.html#part\">ok</a> <a href=\"gone.html\">x</a> <a href=\"/abs.html\">y</a>"
+    write_file with "{dir}/learn/a.html", "<h2 id=\"part\">P</h2><a href=\"../index.html#nope\">z</a>"
+    expect length of (files_under of dir) to be 2
+    let problems be check_site of dir
+    expect length of problems to be 3
+    expect (join with problems, "\n") contains "gone.html" to be true
+    expect (join with problems, "\n") contains "must be relative" to be true
+    expect (join with problems, "\n") contains "#nope" to be true

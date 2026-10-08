@@ -1,0 +1,248 @@
+-- markdown.lekh: a small Markdown-to-HTML converter, written in Lekh.
+-- It handles what Lekh's docs use: headings, paragraphs, **bold**, *italic*,
+-- `code`, [links](url), images, bullet and numbered lists, tables, quotes,
+-- horizontal rules and fenced code blocks (Lekh code gets syntax colours).
+-- Links go through a `fix` task you pass in, so .md links can become .html pages.
+use escape_html, slug_of from "html"
+use highlight from "highlight"
+
+share record Heading:
+    level as number
+    title as text
+    id as text
+
+share record Rendered:
+    html as text
+    title as text
+    headings as list of Heading
+
+-- the converter's working state while it reads the lines
+record Builder:
+    out as list of text
+    para as list of text
+    items as list of text
+    list_kind as text
+    list_start as number
+    rows as list of text
+    quote as list of text
+    headings as list of Heading
+    ids as list of text
+    title as text
+
+-- **bold** and *italic* (the text is already HTML-escaped)
+to emphasis t as text gives text:
+    let changeable s be t
+    for each g in find_groups with t, "\*\*([^*]+)\*\*":
+        change s to replace with s, "**{item 1 of g}**", "<strong>{item 1 of g}</strong>"
+    for each g in find_groups with s, "\*([^*\s][^*]*)\*":
+        change s to replace with s, "*{item 1 of g}*", "<em>{item 1 of g}</em>"
+    give back s
+
+-- One line of text to HTML. Code spans and links are swapped for @@n@@ holes
+-- first, so nothing inside them is touched twice, and put back at the end.
+share to inline source as text, fix as task of text gives text gives text:
+    let changeable s be source
+    let changeable holes be empty list
+    for each code in find_all with source, "`[^`]+`":
+        add "<code>" + (escape_html of (slice with code, 2, (length of code) - 1)) + "</code>" to holes
+        change s to replace with s, code, "@@{length of holes}@@"
+    for each g in find_groups with s, "!\[([^\]]*)\]\(([^)\s]+)\)":
+        let alt be item 1 of g
+        let src be item 2 of g
+        add "<img src=\"{escape_html of (fix with src)}\" alt=\"{escape_html of alt}\" loading=\"lazy\">" to holes
+        change s to replace with s, "![{alt}]({src})", "@@{length of holes}@@"
+    for each g in find_groups with s, "\[([^\]]+)\]\(([^)\s]+)\)":
+        let label be item 1 of g
+        let href be item 2 of g
+        let target be fix with href
+        let outside be if target starts with "http" then " rel=\"noopener\"" otherwise ""
+        add "<a href=\"{escape_html of target}\"{outside}>{emphasis of (escape_html of label)}</a>" to holes
+        change s to replace with s, "[{label}]({href})", "@@{length of holes}@@"
+    change s to emphasis of (escape_html of s)
+    let changeable n be length of holes
+    while n is greater than 0:
+        change s to replace with s, "@@{n}@@", item n of holes
+        decrease n by 1
+    give back s
+
+-- "| a | b \| c |"  ->  ["a", "b | c"]  (\| is a pipe inside a cell)
+to cells_of row as text gives list of text:
+    let changeable r be trimmed of row
+    if r starts with "|": change r to slice with r, 2, length of r
+    if r ends with "|": change r to slice with r, 1, (length of r) - 1
+    let parts be split with (replace with r, "\\|", "@@PIPE@@"), "|"
+    give back turn each p in parts into trimmed of p
+
+to label_for info as text gives text:
+    let words be words of info
+    if length of words is 0: give back "Code"
+    let lang be first of words
+    if lang is "lekh":
+        for each w in words:
+            if w is "error": give back "Lekh · this shows an error message"
+            if w is "test": give back "Lekh · run with lekh test"
+            if w is "check": give back "Lekh · needs the internet"
+            if w starts with "file=": give back slice with w, 6, length of w
+            if w starts with "stdin=":
+                let typed be replace with (replace with (slice with w, 7, length of w), "\"", ""), "|", ", "
+                give back "Lekh · typing: {typed}"
+        give back "Lekh"
+    when lang:
+        is "bash": give back "Terminal"
+        is "rust": give back "Rust"
+        is "text": give back "Text"
+        is "python": give back "Python"
+        otherwise: give back lang
+
+share to code_block lines as list of text, info as text gives text:
+    let words be words of info
+    let lang be if length of words is 0 then "text" otherwise first of words
+    let code be join with lines, "\n"
+    if lang is "output":
+        give back "<div class=\"code output\"><div class=\"code-label\">Output</div><pre>{escape_html of code}</pre></div>"
+    let extra be if info contains "error" then " error" otherwise ""
+    give back "<div class=\"code{extra}\"><div class=\"code-label\">{escape_html of (label_for of info)}</div><pre><code class=\"lang-{lang}\">{highlight with code, lang}</code></pre></div>"
+
+to Builder's emit piece as text changes me:
+    add piece to my out
+
+to Builder's flush_para fix as task of text gives text changes me:
+    if length of my para is 0: give back
+    add "<p>" + (inline with (join with my para, " "), fix) + "</p>" to my out
+    change my para to empty list
+
+to Builder's flush_list fix as task of text gives text changes me:
+    if length of my items is 0: give back
+    let lis be turn each it in my items into "<li>" + (inline with it, fix) + "</li>"
+    let opening be if my list_kind is "ol" and my list_start is not 1 then "<ol start=\"{my list_start}\">" otherwise "<{my list_kind}>"
+    add opening + (join with lis, "") + "</{my list_kind}>" to my out
+    change my items to empty list
+    change my list_kind to ""
+
+to Builder's flush_table fix as task of text gives text changes me:
+    if length of my rows is 0: give back
+    let changeable head be ""
+    let changeable body be empty list
+    for each row and pos in my rows:
+        if pos is 2 and (matches with (trimmed of row), "\|?[\s:|-]+\|?"): skip
+        let tag be if pos is 1 then "th" otherwise "td"
+        let cells be turn each c in cells_of of row into "<{tag}>" + (replace with (inline with c, fix), "@@PIPE@@", "|") + "</{tag}>"
+        let tr be "<tr>" + (join with cells, "") + "</tr>"
+        if pos is 1:
+            change head to tr
+        otherwise:
+            add tr to body
+    add "<div class=\"table\"><table><thead>{head}</thead><tbody>{join with body, ""}</tbody></table></div>" to my out
+    change my rows to empty list
+
+to Builder's flush_quote fix as task of text gives text changes me:
+    if length of my quote is 0: give back
+    add "<blockquote><p>" + (inline with (join with my quote, " "), fix) + "</p></blockquote>" to my out
+    change my quote to empty list
+
+to Builder's flush_all fix as task of text gives text changes me:
+    me's flush_para with fix
+    me's flush_list with fix
+    me's flush_table with fix
+    me's flush_quote with fix
+
+to Builder's heading level as number, words as text, fix as task of text gives text changes me:
+    me's flush_all with fix
+    -- two headings with the same words get different ids: sets, sets-1, sets-2
+    let base be slug_of of words
+    let changeable id be base
+    let changeable n be 0
+    while my ids contains id:
+        change n to n + 1
+        change id to "{base}-{n}"
+    add id to my ids
+    let plain be replace_pattern with (replace with words, "`", ""), "\[([^\]]+)\]\([^)]*\)", ""
+    if level is 1 and my title is "":
+        change my title to plain
+    if level is 2 or level is 3:
+        add (Heading with level level, title plain, id id) to my headings
+    add "<h{level} id=\"{id}\">{inline with words, fix} <a class=\"anchor\" href=\"#{id}\" aria-label=\"Link to this section\">#</a></h{level}>" to my out
+
+to Builder's list_item kind as text, start as number, words as text, fix as task of text gives text changes me:
+    me's flush_para with fix
+    me's flush_table with fix
+    me's flush_quote with fix
+    if my list_kind is not kind:
+        me's flush_list with fix
+        change my list_kind to kind
+        change my list_start to start
+    add words to my items
+
+to Builder's more_for_item words as text changes me:
+    let last_one be (take last from my items) or else ""
+    add last_one + " " + words to my items
+
+-- remove up to `count` leading spaces (code inside an indented list item)
+to drop_indent line as text, count as number gives text:
+    let changeable s be line
+    let changeable left be count
+    while left is greater than 0 and s starts with " ":
+        change s to slice with s, 2, length of s
+        decrease left by 1
+    give back s
+
+-- Turn a whole Markdown document into HTML.
+share to render source as text, fix as task of text gives text gives Rendered:
+    let changeable b be Builder with out empty list, para empty list, items empty list, list_kind "", list_start 1, rows empty list, quote empty list, headings empty list, ids empty list, title ""
+    let changeable in_code be false
+    let changeable code_info be ""
+    let changeable code_indent be 0
+    let changeable code_lines be empty list
+    for each raw in split with source, "\n":
+        if in_code:
+            if trimmed of raw is "```":
+                b's emit with (code_block with code_lines, code_info)
+                change in_code to false
+                change code_lines to empty list
+            otherwise:
+                add (drop_indent with raw, code_indent) to code_lines
+            skip
+        let line be trim_end of raw
+        let t be trimmed of line
+        let indent be (length of line) - (length of trim_start of line)
+        if t starts with "```":
+            b's flush_all with fix
+            change in_code to true
+            change code_info to trimmed of (slice with t, 4, length of t)
+            change code_indent to indent
+            skip
+        if t is "":
+            b's flush_all with fix
+            skip
+        if matches with line, "#{1,6} .*":
+            let level be length of (first of (find_all with line, "^#+"))
+            b's heading with level, (trimmed of (slice with line, level + 1, length of line)), fix
+            skip
+        if t is "---" or t is "***":
+            b's flush_all with fix
+            b's emit with "<hr>"
+            skip
+        if t starts with "|":
+            b's flush_para with fix
+            b's flush_list with fix
+            add t to b's rows
+            skip
+        if t starts with ">":
+            b's flush_para with fix
+            add trimmed of (slice with t, 2, length of t) to b's quote
+            skip
+        if indent is less than 2 and (matches with t, "[*-] .*"):
+            b's list_item with "ul", 1, (slice with t, 3, length of t), fix
+            skip
+        if indent is less than 2 and (matches with t, "[0-9]+\. .*"):
+            let number_text be first of (find_all with t, "^[0-9]+")
+            let start be (number_text as number) or else 1
+            b's list_item with "ol", start, (trimmed of (slice with t, (length of number_text) + 2, length of t)), fix
+            skip
+        if indent is at least 2 and length of b's items is greater than 0 and length of b's para is 0:
+            b's more_for_item with t
+            skip
+        b's flush_list with fix
+        add t to b's para
+    b's flush_all with fix
+    give back Rendered with html (join with b's out, "\n"), title b's title, headings b's headings

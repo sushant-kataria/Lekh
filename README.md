@@ -1,3 +1,15 @@
+<p align="center">
+  <a href="https://sushant-kataria.github.io/Lekh/"><img src="assets/lekh-banner.png" alt="Lekh: code that reads like a sentence" width="100%"></a>
+</p>
+
+<p align="center">
+  <a href="https://sushant-kataria.github.io/Lekh/"><b>🌐 Website</b></a> ·
+  <a href="docs/guide/README.md">Guide</a> ·
+  <a href="docs/reference.md">Reference</a> ·
+  <a href="docs/cheatsheet.md">Cheat sheet</a> ·
+  <a href="examples/">Examples</a>
+</p>
+
 # Lekh
 
 **A programming language that reads like English and is safe like Rust.**
@@ -40,7 +52,7 @@ no coffee here
 * **Safe concurrency.** `at the same time` blocks can't change shared data, so data races are impossible.
 * **Errors that teach.** Every error gives the line, a plain-English
   explanation and a fix you can copy. Lekh even recognises `print`, `null` and `else` from other languages.
-* **Batteries included.** 127 built-in tasks: files, JSON, dates, regex,
+* **Batteries included.** 128 built-in tasks: files, JSON, dates, regex,
   HTTP, shell-free commands, maths, sets and more.
 * **Real tooling.** `lekh test`, `lekh format`, `lekh new`, a REPL, and
   `lekh build`, which translates to Python and runs about 17x faster.
@@ -73,7 +85,7 @@ You need Python 3.8 or newer, and nothing else.
 
 ```bash
 git clone https://github.com/sushant-kataria/Lekh.git
-cd lekh
+cd Lekh
 python3 lekh.py run examples/hello.lekh
 python3 lekh.py repl
 ```
@@ -90,6 +102,7 @@ lekh test       # runs tests/
 
 | | |
 |---|---|
+| 🌐 [**Website**](https://sushant-kataria.github.io/Lekh/) | all of this as a website, built by a Lekh program ([site/](site/build.lekh)) |
 | 📘 [**Guide**](docs/guide/README.md) | a beginner tutorial in 15 short chapters, from install to a real program |
 | 📗 [**Reference**](docs/reference.md) | every keyword, type, operator and built-in task, each with an example |
 | 🛡️ [**Safety**](docs/safety.md) | ownership, borrowing, maybe and result explained simply |
@@ -177,12 +190,30 @@ examples/            example programs (examples/output/ has what they print)
 tests/               the test suite (python3 tests/run_tests.py)
 tools/docs_check.py  runs every code sample in the docs
 benchmarks/          interpreter vs `lekh build` speed
+site/                the website: a static-site generator written in Lekh
+assets/              the banner (drawn by site/banner.lekh) and its open fonts
 ```
+
+## The website is a Lekh program
+
+[sushant-kataria.github.io/Lekh](https://sushant-kataria.github.io/Lekh/) is
+built by [`site/build.lekh`](site/build.lekh). It turns the Markdown in `docs/`
+into pages with a Markdown converter and syntax highlighter that are also
+written in Lekh (`site/lib/`), and runs the examples so the output on the site
+is real.
+
+```bash
+python3 lekh.py site/build.lekh          # writes the site to site/dist/
+python3 lekh.py site/check_links.lekh    # makes sure no link is broken
+```
+
+GitHub Actions builds and publishes it on every push to `main`
+(`.github/workflows/pages.yml`).
 
 ## Running the tests
 
 ```bash
-python3 tests/run_tests.py            # everything: examples, features, errors, builds, tools, docs
+python3 tests/run_tests.py            # everything: examples, features, errors, builds, tools, website, docs
 python3 tools/docs_check.py           # just the documentation samples
 python3 tools/docs_check.py --update  # refresh the outputs shown in the docs
 ```

@@ -1,0 +1,7 @@
+-- examples.lekh: which example programs the Examples page shows. The build runs each one.
+share record Example:
+    file as text
+    title as text
+    blurb as text
+
+share constant EXAMPLES be list of (Example with file "palindrome.lekh", title "Palindromes", blurb "A first program: a task, a loop and text tools."), (Example with file "todo_cli.lekh", title "A to-do list in JSON", blurb "Commands from the command line, data saved as JSON, custom error types and methods. With no arguments it runs a short demo."), (Example with file "inventory_billing.lekh", title "Inventory and GST invoices", blurb "Abilities (traits), generics, choices with data, methods that change their record, and money formatting."), (Example with file "web_fetcher.lekh", title "A concurrent web fetcher", blurb "Fetches pages at the same time with channels. The demo uses built-in pages, so it runs offline."), (Example with file "log_analyzer.lekh", title "A security log analyzer", blurb "Finds brute-force logins and risky sudo commands in an SSH log with patterns, maps and sets."), (Example with file "csv_report.lekh", title "A CSV sales report", blurb "Reads a CSV file, skips bad rows with a clear message, prints a revenue table and writes a JSON summary.")

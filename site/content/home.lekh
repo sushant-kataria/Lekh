@@ -1,0 +1,13 @@
+-- home.lekh: the words on the home page, kept as Lekh data.
+share constant TAGLINE be "Code that reads like a sentence"
+
+share constant PITCH be "Lekh is a small programming language that reads like plain English and keeps you safe like Rust. No null. No ignored errors. No data races. Just programs you can read out loud."
+
+share record Feature:
+    icon as text
+    title as text
+    blurb as text
+    code as text
+
+-- the `code` of each feature is a short Lekh sample (\n starts a new line); "" means none
+share constant FEATURES be list of (Feature with icon "Aa", title "Reads like English", blurb "Keywords are words: let, say, for each, give back, if it is at least. There are very few symbols to learn, and blocks are just indentation.", code "for each fruit in list of \"mango\", \"guava\":\n    say \"I like {{fruit}\""), (Feature with icon "∅", title "No null, no surprises", blurb "A value that might be missing is a maybe, and work that can fail gives a result. Lekh won't let you forget to handle either one.", code "when prices at \"chai\":\n    is some p: say \"₹{{p}\"\n    is nothing: say \"sold out\""), (Feature with icon "⇄", title "Safe ownership: look, lend, give", blurb "Every list has one owner. Pass a value to look at it, lend it to let a task change it, or give it away for good. Rust's safety in three words.", code "add_tax with lend prices\narchive with give old_prices\nlet backup be copy of prices"), (Feature with icon "!", title "Friendly errors", blurb "Lekh checks the whole program before it runs. Every error names the line, explains the problem in plain English and shows a fix you can copy.", code ""), (Feature with icon "∥", title "Safe concurrency", blurb "Run work at the same time with channels and jobs. Code running side by side can read, but never change, shared values, so data races are impossible.", code "for each url in urls at the same time:\n    send (http_get of url) to pages"), (Feature with icon "⚡", title "Fast builds", blurb "lekh build turns a checked program into Python. Same output, all the safety checks, and much faster than the interpreter.", code "")
