@@ -1,0 +1,8 @@
+URL              STATUS   BYTES  TITLE
+demo://news         200   5,025  Daily News
+demo://shop         200   1,219  Shop
+demo://gone         404      24  Not Found
+failed: demo://missing: no such demo page
+failed: ftp://old.example: only http:// and https:// addresses are allowed, not "ftp://old.example"
+2 ok, 1 bad status, 2 failed
+5 pages fetched at the same time (each takes 0.3s): faster than one after another? true

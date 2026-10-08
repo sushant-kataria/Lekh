@@ -1,0 +1,4 @@
+-- expect: `secret` is private to the module
+-- expect: share
+-- static
+use secret from "lib/private_mod"

@@ -1,0 +1,4 @@
+Area: 12.57
+Area: 12
+Left: 70
+Ravi is 0

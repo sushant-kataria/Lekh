@@ -1,0 +1,12 @@
+-- This file is SUPPOSED to fail: it checks that `lekh test` reports failures clearly.
+to shout t as text gives text:
+    give back t's uppercase
+
+test "shout works":
+    expect shout of "hi" to be "HI"
+
+test "shout adds an exclamation mark":
+    expect shout of "hi" to be "HI!"
+
+test "lists are compared fully":
+    expect list of 1, 2 not to be list of 1, 2

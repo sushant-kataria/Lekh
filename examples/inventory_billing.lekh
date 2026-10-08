@@ -1,0 +1,110 @@
+-- inventory_billing.lekh: stock, discounts and GST invoices.
+-- Shows: abilities (traits) with default tasks, generics, methods that change their record,
+-- choices with data, custom error types, sorting, number formatting.
+ability Priced:
+    to price gives number
+    to label gives text
+    to tax_rate gives number:
+        give back 0.18
+
+record Product:
+    sku as text
+    name as text
+    unit_price as number
+
+record Service:
+    name as text
+    hours as number
+    hourly_rate as number
+
+to Product's price gives number:
+    give back my unit_price
+
+to Product's label gives text:
+    give back "{my name} ({my sku})"
+
+to Service's price gives number:
+    give back my hours * my hourly_rate
+
+to Service's label gives text:
+    give back "{my name}, {my hours} h"
+
+to Service's tax_rate gives number:
+    give back 0.12
+
+Product can Priced
+Service can Priced
+
+-- a generic container: a Line holds any Priced thing and a quantity
+record Line of T:
+    thing as T
+    quantity as number
+
+choice Discount:
+    NoDiscount
+    Percent with off as number
+    Flat with amount as number
+
+to Discount's apply_to total as number gives number:
+    when me:
+        is NoDiscount: give back total
+        is Percent with p: give back total - total * p / 100
+        is Flat with a: give back larger with 0, total - a
+
+record Stock:
+    counts as map of text to number
+
+choice StockError:
+    UnknownItem with sku as text
+    NotEnough with sku as text, wanted as number, have as number
+
+to Stock's reserve sku as text, wanted as number changes me gives result of number or StockError:
+    let have be (my counts at sku) or else -1
+    if have is less than 0: give back problem (UnknownItem with sku sku)
+    if wanted is greater than have: give back problem (NotEnough with sku sku, wanted wanted, have have)
+    change my counts at sku to have - wanted
+    give back ok have - wanted
+
+to money amount as number gives text:
+    give back "₹" + (with_commas with amount, 2)
+
+to line_total line as Line of Priced gives number:
+    give back line's thing's price * line's quantity
+
+to print_invoice customer as text, lines as list of Line of Priced, discount as Discount:
+    say "INVOICE for {customer}"
+    say repeat_text with "=", 52
+    let changeable subtotal be 0
+    let changeable tax be 0
+    let sorted_lines be sort each l in lines by line_total of l descending
+    for each l in sorted_lines:
+        let amount be line_total of l
+        increase subtotal by amount
+        increase tax by amount * l's thing's tax_rate
+        say "{pad_right with l's thing's label, 28}{pad_left with "x{l's quantity}", 6}{pad_left with money of amount, 18}"
+    say repeat_text with "-", 52
+    let after be discount's apply_to with subtotal
+    say "{pad_right with "Subtotal", 34}{pad_left with money of subtotal, 18}"
+    if after is not subtotal:
+        say "{pad_right with "After discount", 34}{pad_left with money of after, 18}"
+    let scaled_tax be tax * after / subtotal
+    say "{pad_right with "GST", 34}{pad_left with money of scaled_tax, 18}"
+    say "{pad_right with "TOTAL", 34}{pad_left with money of (after + scaled_tax), 18}"
+    say ""
+
+let keyboard be Product with sku "KB-01", name "Mechanical keyboard", unit_price 4999
+let mouse be Product with sku "MS-02", name "Wireless mouse", unit_price 1299
+let setup be Service with name "Desk setup", hours 2, hourly_rate 800
+
+let changeable stock be Stock with counts (map of "KB-01" to 5, "MS-02" to 2)
+let order be list of ("KB-01", 2), ("MS-02", 3), ("XX-99", 1), ("MS-02", 2)
+for each (sku, qty) in order:
+    when stock's reserve with sku, qty:
+        is ok left: say "reserved {qty} x {sku}, {left} left"
+        is problem (NotEnough with s, w, h): say "can't reserve {w} x {s}: only {h} in stock"
+        is problem (UnknownItem with s): say "unknown product {s}"
+say ""
+
+let lines as list of Line of Priced be list of (Line with thing keyboard, quantity 2), (Line with thing copy of mouse, quantity 2), (Line with thing setup, quantity 1)
+print_invoice with "Sushant K", lines, (Percent with off 10)
+print_invoice with "Walk-in customer", (list of (Line with thing mouse, quantity 1)), NoDiscount

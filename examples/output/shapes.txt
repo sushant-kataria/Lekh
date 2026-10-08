@@ -1,0 +1,6 @@
+A circle of radius 2 has area 12.57
+A 3 by 4 rectangle has area 12
+A 5 by 5 square has area 25
+A triangle has area 6
+A dot has area 0
+Total area: 55.57 (1 circle, 5 shapes)

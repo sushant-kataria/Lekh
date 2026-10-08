@@ -1,0 +1,11 @@
+Sushant has 150
+can afford 120? true
+can afford 500? false
+a shape with area 4
+a circle of radius 1
+total area: 7.14
+swapped: one, 1
+4
+none
+tree total: 3
+gauge after reset: 0

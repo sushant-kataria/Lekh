@@ -1,0 +1,8 @@
+-- expect: some values might match none of them
+-- expect: otherwise:
+-- static
+to describe n as number gives text:
+    when n:
+        is m if m is greater than 0: give back "positive"
+        is m if m is less than 0: give back "negative"
+say describe with 0

@@ -1,0 +1,5 @@
+Total before tax: 390
+After tax: [118, 295, 47.2], total 460.2
+basket now owns [118, 295, 47.2]
+archived 3 prices
+Fruits and drinks: apple, kiwi, apple juice, kiwi juice

@@ -1,0 +1,53 @@
+file has 2 lines: ["first line", "second line"]
+exists? true, size 23 bytes
+folder: ["data.json", "notes.txt"]
+expected problem: no file or folder called "/tmp/definitely/not/here.txt"
+after delete: ["notes.txt"]
+name notes.txt, ext txt
+[{"name": "pen", "qty": 3}, {"name": "ink", "qty": 1}]
+parsed 2 items, first name: pen
+bad json -> bad JSON at line 1, column 2: Expecting property name enclosed in double quotes
+port: 8080, second tag: b
+{
+  "ok": true,
+  "score": 9.5,
+  "tags": [
+    "x"
+  ]
+}
+Thursday, 08 October 2026 at 09:30
+30 days later: 2026-11-07 (Saturday)
+days between: 30
+year 2026, month 10, day 8
+bad date -> true
+now is a number? decimal
+rolls are between 1 and 6: true
+random item from list is in list: true
+["2026-10-08", "2026-10-09"]
+has error? true
+is a date? true
+call XXX-XXXX or XXX-XXXX
+[["user", "ann"], ["id", "7"]]
+["a", "b", "c"]
+app.log matches *.log? true
+union set of 1, 2, 3, 4, 5
+both set of 3, 4, only a set of 1, 2
+subset? true, contains 2? true
+unique words: set of "be", "not", "or", "to" (4)
+processing job1, waiting ["job2", "job3", "job4"]
+popped 3, stack [1, 2]
+taking from empty gives nothing: true
+["Amit(25)", "Bea(30)", "Zoe(30)"]
+[1, 4, 9]
+[2, 4]
+24
+[3, 1, 2]
+[(1, "x"), (2, "y")]
+[[1, 2, 3], [4, 5, 6], [7]]
+[("a", 1), ("b", 2)]
+{"k1": 10, "k2": 20}
+arguments: ["alpha", "beta"]
+HOME is set? true
+command said: hello from the shell (code 0)
+no shell, so this is just text: $HOME; rm -rf /
+missing program -> true

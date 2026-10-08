@@ -1,0 +1,20 @@
+[Ada Lovelace] [ADA LOVELACE] [12]
+program
+000042|ab   |***hi***
+=-=-=-=-=-
+banana has 3 a's
+is '12.5' a number? true  is 'abc'? false
+2026/10/08
+["a", "b", "", "c"]
+the_quick_brown_fox
+starts: true, ends: true
+position of 'love': 5
+letter codes: 65 a
+3.14 | 1,234,567 | 9,876.50
+whole 7, floor -3, ceiling 3, round 2.7
+power 18446744073709551616, sqrt 12, hex ff, binary 1010
+smaller 3, larger pear, clamp 10
+type_of: integer, decimal, text, list
+sine of pi/2 = 1, log10 of 1000 = 3
+average 5
+Total: ₹4,498.50

@@ -1,0 +1,4 @@
+-- expect: can never change
+-- static
+constant LIMIT be 10
+change LIMIT to 20

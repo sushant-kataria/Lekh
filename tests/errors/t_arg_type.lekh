@@ -1,0 +1,6 @@
+-- expect: The input `price` of `add_tax` should be a number, but here it's text
+-- static
+to add_tax price as number gives number:
+    give back price * 1.18
+
+say add_tax with "100"

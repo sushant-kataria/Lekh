@@ -1,0 +1,4 @@
+-- expect: should end with ':'
+let x be 5
+if x is 5
+    say "five"

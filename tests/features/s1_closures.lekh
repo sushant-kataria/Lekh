@@ -1,0 +1,44 @@
+-- closures, given tasks and English list forms
+let numbers be list of 5, 3, 8, 1, 9, 2
+
+let evens be keep each n in numbers where n mod 2 is 0
+say "evens: {evens}"
+let doubled be turn each n in numbers into n * 2
+say "doubled: {doubled}"
+let big be count each n in numbers where n is greater than 4
+say "big ones: {big}"
+let first_big be find first n in numbers where n is greater than 7
+say "first over 7: {first_big or else 0}"
+say "any negative? {any n in numbers where n is less than 0}"
+say "all positive? {every n in numbers where n is greater than 0}"
+let total be combine each n in numbers into acc starting at 0 using acc + n
+say "total: {total}"
+let sorted_down be sort each n in numbers by n descending
+say "sorted: {sorted_down}"
+
+let factor be 3
+let triple be given x: x * factor
+say "triple of 7: {triple with 7}"
+
+to apply_twice f, x:
+    give back f with (f with x)
+
+say "apply twice: {apply_twice with triple, 2}"
+
+to make_adder amount as number gives task of number gives number:
+    give back given x: x + amount
+
+let add10 be make_adder with 10
+say "add10 of 5: {add10 with 5}"
+
+let words be list of "pear", "fig", "banana", "kiwi"
+let by_length be sort each w in words by length of w
+say "by length: {by_length}"
+let shout be turn each w in words into w's uppercase
+say "shout: {shout}"
+
+let describe be given n:
+    if n is greater than 5:
+        give back "big"
+    give back "small"
+say "8 is {describe with 8}, 2 is {describe with 2}"

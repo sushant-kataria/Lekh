@@ -1,0 +1,115 @@
+-- args: alpha beta
+-- standard library: files, JSON, dates, random, patterns, sets, queues, sorting, env, shell
+let folder be "/tmp/lekh_s2_test"
+make_folder of folder
+let path be join_path with folder, "notes.txt"
+write_file with path, "first line\n"
+append_file with path, "second line\n"
+when read_lines of path:
+    is ok lines: say "file has {length of lines} lines: {lines}"
+    is problem why: say "could not read: {why}"
+say "exists? {file_exists of path}, size {(file_size of path) or else 0} bytes"
+write_file with (join_path with folder, "data.json"), "[1, 2]"
+say "folder: {(list_folder of folder) or else (empty list)}"
+when read_file of "/tmp/definitely/not/here.txt":
+    is ok t: say t
+    is problem why: say "expected problem: {why}"
+delete_file of (join_path with folder, "data.json")
+say "after delete: {(list_folder of folder) or else (empty list)}"
+say "name {file_name of path}, ext {extension of path}"
+
+-- JSON round trip
+record Item:
+    name as text
+    qty as number
+
+let items be list of (Item with name "pen", qty 3), (Item with name "ink", qty 1)
+let text be to_json of items
+say text
+when from_json of text:
+    is ok data:
+        say "parsed {length of data} items, first name: {(json_get with data, "1.name") or else "?"}"
+    is problem why: say why
+when from_json of "{{oops":
+    is ok v: say "unexpected"
+    is problem why: say "bad json -> {why}"
+let config be (from_json of "{{\"server\": {{\"port\": 8080, \"tags\": [\"a\", \"b\"]}}}}") or else (empty map)
+say "port: {(json_get with config, "server.port") or else 0}, second tag: {(json_get with config, "server.tags.2") or else "-"}"
+let summary as map of text to anything be map of "ok" to true, "score" to 9.5, "tags" to (list of "x")
+say to_json with summary, true
+
+-- dates
+let launch be (parse_date of "2026-10-08 09:30") or else 0
+say format_time with launch, "DDDD, DD MMMM YYYY at hh:mm"
+let later be add_days with launch, 30
+say "30 days later: {format_time with later, "YYYY-MM-DD"} ({weekday_of of later})"
+say "days between: {days_between with launch, later}"
+say "year {year_of of launch}, month {month_of of launch}, day {day_of of launch}"
+say "bad date -> {(parse_date of "08-10-2026") is problem}"
+say "now is a number? {type_of of now}"
+
+-- random (seeded so the output is repeatable)
+seed_random with 7
+let rolls be turn each n in range from 1 to 5 into random with 1, 6
+say "rolls are between 1 and 6: {every r in rolls where r is between 1 and 6}"
+say "random item from list is in list: {(list of "a", "b", "c") contains (random_item of (list of "a", "b", "c"))}"
+
+-- patterns (regex-lite) and wildcards
+let log be "2026-10-08 ERROR disk full; 2026-10-09 WARN cpu hot"
+say find_all with log, "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+say "has error? {contains_pattern with log, "ERROR|FATAL"}"
+say "is a date? {matches with "2026-10-08", "[0-9]{4}-[0-9]{2}-[0-9]{2}"}"
+say replace_pattern with "call 555-1234 or 555-9876", "[0-9]{3}-[0-9]{4}", "XXX-XXXX"
+say find_groups with "user=ann id=7", "(\\w+)=(\\w+)"
+say split_pattern with "a, b;c", "[,;] *"
+say "app.log matches *.log? {matches_wildcard with "app.log", "*.log"}"
+
+-- sets
+let a be set of 1, 2, 3, 4
+let b be set of 3, 4, 5
+say "union {union with a, b}"
+say "both {intersection with a, b}, only a {difference with a, b}"
+say "subset? {is_subset with (set of 3, 4), a}, contains 2? {a contains 2}"
+let changeable seen be empty set
+for each w in words of "to be or not to be":
+    add w to seen
+say "unique words: {seen} ({length of seen})"
+
+-- queues and stacks
+let changeable queue be list of "job1", "job2", "job3"
+add "job4" to queue
+let next_job be take first from queue
+say "processing {next_job or else "none"}, waiting {queue}"
+let changeable stack be list of 1, 2, 3
+let top be take last from stack
+say "popped {top or else 0}, stack {stack}"
+let changeable empty_q be list of 0
+take first from empty_q
+say "taking from empty gives nothing: {(take first from empty_q) is nothing}"
+
+-- custom sorting
+record Person:
+    name as text
+    age as number
+let people be list of (Person with name "Zoe", age 30), (Person with name "Amit", age 25), (Person with name "Bea", age 30)
+let by_age_then_name be sorted_using with people, given x, y: x's age is less than y's age or (x's age is y's age and x's name is less than y's name)
+say turn each p in by_age_then_name into "{p's name}({p's age})"
+say transform with (list of 1, 2, 3), given n: n * n
+say select with (list of 1, 2, 3, 4), given n: n mod 2 is 0
+say reduce with (list of 1, 2, 3, 4), 1, given acc, n: acc * n
+say unique of (list of 3, 1, 3, 2, 1)
+say numbered of (list of "x", "y")
+say chunks with (range from 1 to 7), 3
+say pairs_of with (list of "a", "b"), (list of 1, 2)
+say map_from of (list of ("k1", 10), ("k2", 20))
+
+-- program arguments, environment and commands
+say "arguments: {arguments}"
+say "HOME is set? {(environment of "HOME") is some}"
+when run_command of "echo hello from the shell":
+    is ok out: say "command said: {out's output's trimmed} (code {out's code})"
+    is problem why: say "command failed: {why}"
+when run_command of "echo $HOME; rm -rf /":
+    is ok out: say "no shell, so this is just text: {out's output's trimmed}"
+    is problem why: say why
+say "missing program -> {(run_command of "no_such_program_xyz") is problem}"

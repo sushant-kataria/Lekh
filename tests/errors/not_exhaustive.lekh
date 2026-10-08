@@ -1,0 +1,8 @@
+-- expect: Unhandled case
+-- expect: Triangle
+choice Shape:
+    Circle with radius
+    Triangle with base, height
+let s be Circle with radius 1
+when s:
+    is Circle with r: say r

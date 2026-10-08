@@ -1,0 +1,11 @@
+Words: 15
+Letters (no spaces): 57
+Unique words: 10
+  dog: 2
+  fox: 2
+  the: 4
+Most common word: 'the' (4 times)
+Longest word: 'sleeps'
+Shouting: THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. THE DOG SLEEPS, THE FOX RUNS!
+Backwards: hkeL
+No cats were mentioned.

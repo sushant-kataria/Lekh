@@ -1,0 +1,7 @@
+-- expect: You can't increase `total` inside `at the same time`
+-- expect: data race
+-- expect: channel
+-- static
+let changeable total be 0
+for each n from 1 to 10 at the same time:
+    increase total by n

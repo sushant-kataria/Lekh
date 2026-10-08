@@ -1,0 +1,40 @@
+-- shapes.lekh: a choice (enum) with pattern matching
+
+choice Shape:
+    Circle with radius as number
+    Rectangle with width as number, height as number
+    Triangle with base as number, height as number
+    Dot
+
+to area shape as Shape gives number:
+    when shape:
+        is Circle with r: give back 3.14159 * r * r
+        is Rectangle with w, h: give back w * h
+        is Triangle with b, h: give back b * h / 2
+        is Dot: give back 0
+
+to describe shape as Shape gives text:
+    when shape:
+        is Circle with r: give back "a circle of radius {r}"
+        is Rectangle with w, h:
+            if w is h: give back "a {w} by {h} square"
+            give back "a {w} by {h} rectangle"
+        otherwise: give back "a {kind_name of shape}"
+
+to kind_name shape as Shape gives text:
+    when shape:
+        is Triangle: give back "triangle"
+        otherwise: give back "dot"
+
+let shapes be list of Circle with radius 2, Rectangle with width 3, height 4, Rectangle with width 5, height 5, Triangle with base 6, height 2, Dot
+
+let changeable total be 0
+let changeable circles be 0
+for each shape in shapes:
+    let size be area of shape
+    say "{capitalized of describe of shape} has area {round with size, 2}"
+    increase total by size
+    if shape is a Circle:
+        increase circles by 1
+
+say "Total area: {round with total, 2} ({circles} circle, {length of shapes} shapes)"

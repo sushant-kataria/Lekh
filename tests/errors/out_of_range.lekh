@@ -1,0 +1,4 @@
+-- expect: Out of range
+-- expect: has 2 items, so there is no item 5
+let cart be list of "milk", "eggs"
+say item 5 of cart

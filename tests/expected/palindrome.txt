@@ -1,0 +1,4 @@
+racecar is a palindrome
+Level is a palindrome
+hello is not a palindrome
+Never odd or even is a palindrome

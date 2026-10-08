@@ -1,0 +1,5 @@
+7 squared is 49
+10! is 3628800
+A circle of radius 3 has area 28.27
+Average score: 85
+Average of nothing: 0

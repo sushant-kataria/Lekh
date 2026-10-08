@@ -1,0 +1,10 @@
+-- expect: `Dog` says it can `Speak`, but it has no task called `sound`
+-- expect: to Dog's sound
+-- static
+ability Speak:
+    to sound gives text
+
+record Dog:
+    name as text
+
+Dog can Speak

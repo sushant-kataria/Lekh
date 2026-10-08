@@ -1,0 +1,3 @@
+-- expect: I couldn't understand this line
+-- expect: let x be 5
+x = 5

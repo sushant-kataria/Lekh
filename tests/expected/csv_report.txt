@@ -1,0 +1,15 @@
+Reading examples/data/sales.csv ...
+  skipping row 13: units "bad" is not a number
+
+Region           Revenue
+------------------------
+North            ₹82,459
+East             ₹71,981
+South            ₹55,962
+West             ₹16,477
+------------------------
+Total           ₹226,879
+
+Best seller by units: Mouse (73 units)
+Orders of ₹10,000 or more: 9
+Summary written to /tmp/sales_summary.json

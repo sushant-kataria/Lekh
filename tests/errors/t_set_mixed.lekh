@@ -1,0 +1,4 @@
+-- expect: `more` holds text, so you can't put a number in it
+let tags be set of "a", "b"
+let changeable more be copy of tags
+add 3 to more

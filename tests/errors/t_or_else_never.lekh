@@ -1,0 +1,4 @@
+-- expect: `or else` is for values that might be missing
+-- static
+let names be list of "a", "b"
+let n be (length of names) or else 0

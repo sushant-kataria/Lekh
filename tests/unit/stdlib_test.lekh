@@ -1,0 +1,46 @@
+-- Unit tests for the standard library.
+test "json round trip":
+    let data be (from_json of "[1, 2, 3]") or else (empty list)
+    expect to_json of data to be "[1, 2, 3]"
+    expect from_json of "nope" to be problem
+
+test "files":
+    let path be "/tmp/lekh_unit_test.txt"
+    write_file with path, "abc"
+    expect (read_file of path) or else "" to be "abc"
+    append_file with path, "def"
+    expect (read_file of path) or else "" to be "abcdef"
+    delete_file of path
+    expect file_exists of path to be false
+
+test "patterns":
+    expect matches with "abc123", "[a-z]+[0-9]+" to be true
+    expect find_all with "a1b2", "[0-9]" to be list of "1", "2"
+    expect replace_pattern with "a  b", " +", " " to be "a b"
+
+test "dates":
+    let d be (parse_date of "2026-01-31") or else 0
+    expect format_time with (add_days with d, 1), "YYYY-MM-DD" to be "2026-02-01"
+    expect weekday_of of d to be "Saturday"
+
+test "numbers and text":
+    expect format_number with 2.5, 2 to be "2.50"
+    expect with_commas of 1000000 to be "1,000,000"
+    expect pad_left with "5", 3, "0" to be "005"
+    expect slice with "hello", 2, 4 to be "ell"
+    expect title_case of "big red dog" to be "Big Red Dog"
+
+test "sets and queues":
+    expect union with (set of 1), (set of 2) to be set of 1, 2
+    let changeable q be list of "a", "b"
+    expect take first from q to be some "a"
+    expect q to be list of "b"
+
+test "sorting with a custom comparison":
+    let words be list of "ccc", "a", "bb"
+    expect sorted_using with words, given x, y: length of x is less than length of y to be list of "a", "bb", "ccc"
+
+test "commands are not run by a shell":
+    when run_command of "echo a; echo b":
+        is ok out: expect out's output to be "a; echo b\n"
+        is problem why: expect why to be "no problem"

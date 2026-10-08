@@ -1,0 +1,5 @@
+-- expect: Type mix-up
+-- expect: Can't add text and a number
+-- expect: {total}
+let total be 42
+say "Total: " + total

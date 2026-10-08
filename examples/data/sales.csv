@@ -1,0 +1,13 @@
+date,region,product,units,unit_price
+2026-09-01,North,Keyboard,12,1499
+2026-09-01,South,Mouse,30,499
+2026-09-02,North,Monitor,4,12999
+2026-09-03,East,Keyboard,7,1499
+2026-09-03,South,Monitor,2,12999
+2026-09-04,West,Mouse,18,499
+2026-09-05,East,Headset,9,2499
+2026-09-05,North,Mouse,25,499
+2026-09-06,West,Keyboard,5,1499
+2026-09-07,South,Headset,6,2499
+2026-09-08,East,Monitor,3,12999
+2026-09-08,West,Headset,bad,2499

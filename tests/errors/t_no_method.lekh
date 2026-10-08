@@ -1,0 +1,6 @@
+-- expect: has no field or task called `bark`
+record Cat:
+    name as text
+
+let c be Cat with name "Tom"
+say c's bark with 3

@@ -1,0 +1,9 @@
+squares (any order, sorted): [9, 16, 25]
+fetched 4 pages: ["https://a.example", "https://b.example", "https://c.example", "https://d.example"]
+ran in parallel (well under 0.4s): true
+doing other work while jobs run...
+job results: 36 and 49
+all jobs: [1, 4, 9, 16]
+received hello then world
+after close, empty channel gives nothing: true
+multiples of 3 up to 20: 6

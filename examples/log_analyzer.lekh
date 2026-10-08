@@ -1,0 +1,70 @@
+-- log_analyzer.lekh: spot suspicious activity in an SSH/sudo log.
+--   lekh run examples/log_analyzer.lekh [path/to/auth.log] [threshold]
+-- Shows: pattern matching with find_groups, records and choices, maps and sets,
+-- sorting by key, `when` with guards, constants, reading arguments.
+constant DEFAULT_LOG be "examples/data/auth.log"
+constant RISKY_FILES be list of "/etc/shadow", "/etc/sudoers", "/root/.ssh"
+
+choice Event:
+    LoginFailed with user as text, ip as text, time as text
+    LoginOk with user as text, ip as text, method as text, time as text
+    Sudo with user as text, command as text, time as text
+    Other
+
+to parse_line line as text gives Event:
+    let failed be find_groups with line, "^(\S+ \S+) sshd: Failed password for (\S+) from (\S+)"
+    if length of failed is greater than 0:
+        let g be first of failed
+        give back LoginFailed with user item 2 of g, ip item 3 of g, time item 1 of g
+    let accepted be find_groups with line, "^(\S+ \S+) sshd: Accepted (\S+) for (\S+) from (\S+)"
+    if length of accepted is greater than 0:
+        let g be first of accepted
+        give back LoginOk with user item 3 of g, ip item 4 of g, method item 2 of g, time item 1 of g
+    let sudo be find_groups with line, "^(\S+ \S+) sudo: (\S+) : COMMAND=(.*)$"
+    if length of sudo is greater than 0:
+        let g be first of sudo
+        give back Sudo with user item 2 of g, command item 3 of g, time item 1 of g
+    give back Other
+
+let args be arguments
+let path be if length of args is at least 1 then first of args otherwise DEFAULT_LOG
+let threshold be if length of args is at least 2 then ((item 2 of args) as integer) or else 3 otherwise 3
+let lines be (read_lines of path) or else (empty list)
+say "Analysing {length of lines} lines from {path} (alert at {threshold}+ failures)"
+
+let changeable failures be empty map
+let changeable users_tried be empty map
+let changeable alerts be empty list
+let changeable unparsed be 0
+for each line in lines:
+    when parse_line of line:
+        is LoginFailed with user, ip, time:
+            change failures at ip to ((failures at ip) or else 0) + 1
+            let changeable tried be (users_tried at ip) or else (empty set)
+            add user to tried
+            change users_tried at ip to tried
+        is LoginOk with user, ip, method, time if ((failures at ip) or else 0) is at least threshold:
+            add "{time}  HIGH  {user} logged in from {ip} by {method} after {(failures at ip) or else 0} failures (possible brute force success)" to alerts
+        is LoginOk with user, ip, method, time if user is "root":
+            add "{time}  MED   direct root login from {ip}" to alerts
+        is LoginOk: skip
+        is Sudo with user, command, time if any f in RISKY_FILES where command contains f:
+            add "{time}  HIGH  {user} ran `{command}` (touches a sensitive file)" to alerts
+        is Sudo: skip
+        is Other: increase unparsed by 1
+
+say ""
+say "Failed logins by address:"
+let ranked be sort each ip in (keys of failures) by (failures at ip) or else 0 descending
+for each ip in ranked:
+    let n be (failures at ip) or else 0
+    let names be join with (sorted of (((users_tried at ip) or else (empty set)) as list)), ", "
+    let flag be if n is at least threshold then "  <-- over threshold" otherwise ""
+    say "  {pad_right with ip, 16}{pad_left with (n as text), 3}  users: {names}{flag}"
+
+say ""
+say "Alerts ({length of alerts}):"
+for each a in alerts:
+    say "  {a}"
+say ""
+say "{unparsed} lines were not auth events."

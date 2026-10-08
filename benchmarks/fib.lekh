@@ -1,0 +1,18 @@
+-- Benchmark: recursive Fibonacci plus a loop over a list.
+to fib n as number gives number:
+    if n is less than 2:
+        give back n
+    give back (fib of (n - 1)) + (fib of (n - 2))
+
+say "fib of 24 = {fib of 24}"
+
+let changeable total be 0
+for each i from 1 to 200000:
+    if i mod 3 is 0:
+        increase total by i
+say "sum of multiples of 3 up to 200000 = {total}"
+
+let numbers be range from 1 to 50000
+let squares be turn each n in numbers into n * n
+let big be count each s in squares where s mod 7 is 1
+say "squares that leave 1 when divided by 7: {big}"

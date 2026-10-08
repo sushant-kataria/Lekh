@@ -1,0 +1,3 @@
+-- expect: Lekh says `otherwise` instead of `else`
+let n be 4
+let label be if n is greater than 3 then "big" else "small"

@@ -1,0 +1,4 @@
+-- expect: Type mix-up
+-- expect: should be a number
+-- expect: as number
+let age as number be "thirty"

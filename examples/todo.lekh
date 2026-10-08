@@ -1,0 +1,44 @@
+-- todo.lekh: a tiny to-do list using a record, a list, and lending
+
+record Task:
+    title as text
+    done as truth
+
+-- this task only *looks* at the list (shared, read-only)
+to show tasks as list of Task:
+    say "Your list:"
+    for each task and position in tasks:
+        if task's done:
+            say "  {position}. [x] {task's title}"
+        otherwise:
+            say "  {position}. [ ] {task's title}"
+
+-- this task *changes* the list, so the input is marked changeable
+to finish wanted as text, changeable tasks as list of Task:
+    for each changeable task in tasks:
+        if task's title is wanted:
+            change task's done to true
+            say "Finished: {wanted}"
+            give back
+    say "Couldn't find a task called '{wanted}'."
+
+to count_left tasks as list of Task gives number:
+    let changeable left be 0
+    for each task in tasks:
+        if not task's done:
+            increase left by 1
+    give back left
+
+let changeable tasks be an empty list
+add a Task with title "Buy milk", done false to tasks
+add a Task with title "Write the Lekh docs", done false to tasks
+add a Task with title "Call Mom", done false to tasks
+
+show with tasks
+say ""
+finish with "Buy milk", lend tasks
+finish with "Walk the dog", lend tasks
+finish with "Call Mom", lend tasks
+say ""
+show with tasks
+say "{count_left of tasks} of {length of tasks} tasks left."

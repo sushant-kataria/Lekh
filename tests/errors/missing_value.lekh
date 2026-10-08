@@ -1,0 +1,5 @@
+-- expect: Possibly missing value
+-- expect: or else
+let ages be map of "Asha" to 30, "Ravi" to 25
+let age be ages at "Sushant"
+say "Next year: {age + 1}"

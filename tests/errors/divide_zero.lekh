@@ -1,0 +1,4 @@
+-- expect: Math problem
+-- expect: divide by zero
+let zero be 0
+say 10 / zero

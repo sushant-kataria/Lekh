@@ -1,0 +1,5 @@
+-- expect: This might be missing
+-- static
+let changeable queue be list of 1, 2
+let next be take first from queue
+say next + 1

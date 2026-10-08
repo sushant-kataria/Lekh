@@ -1,0 +1,14 @@
+-- lib/mathtools.lekh: a small module (other files can `use` it)
+
+share let pi be 3.14159
+
+share to square n as number gives number:
+    give back n * n
+
+share to factorial n as number gives number:
+    if n is at most 1: give back 1
+    give back n * factorial of (n - 1)
+
+share to average numbers as list of number gives maybe number:
+    if length of numbers is 0: give back nothing
+    give back some (sum of numbers) / length of numbers

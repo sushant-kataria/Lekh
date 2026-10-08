@@ -1,0 +1,6 @@
+-- expect: An `if` condition needs true/false, but this is a number
+-- expect: if count is greater than 0
+-- static
+let count be 3
+if count:
+    say "yes"

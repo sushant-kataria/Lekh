@@ -1,0 +1,55 @@
+-- bank.lekh: a bank account with safe error handling (no crashes, no null)
+
+record Account:
+    owner as text
+    balance as number
+
+to deposit changeable account as Account, amount as number gives result of number:
+    if amount is at most 0:
+        give back problem "a deposit must be more than 0 (got {amount})"
+    increase account's balance by amount
+    give back ok account's balance
+
+to withdraw changeable account as Account, amount as number gives result of number:
+    if amount is greater than account's balance:
+        give back problem "not enough money: {account's owner} has {account's balance}, asked for {amount}"
+    decrease account's balance by amount
+    give back ok account's balance
+
+-- `try` means: if this is a problem, stop here and pass the problem up
+to transfer changeable source as Account, changeable target as Account, amount as number gives result of number:
+    try withdraw with lend source, amount
+    try deposit with lend target, amount
+    give back ok amount
+
+-- turning user text into a safe number
+to parse_amount input as text gives result of number:
+    let amount be try input as number
+    if amount is less than 0: give back problem "amounts can't be negative"
+    give back ok amount
+
+let changeable mine be an Account with owner "Sushant", balance 100
+let changeable savings be an Account with owner "Savings", balance 0
+
+when deposit with lend mine, 50:
+    is ok balance: say "Deposited 50. Balance is now {balance}."
+    is problem why: say "Deposit failed: {why}"
+
+when withdraw with lend mine, 500:
+    is ok balance: say "Withdrew 500. Balance is now {balance}."
+    is problem why: say "Withdrawal failed: {why}"
+
+when transfer with lend mine, lend savings, 120:
+    is ok moved: say "Moved {moved} to savings."
+    is problem why: say "Transfer failed: {why}"
+
+-- `or else` gives a fallback value when something goes wrong
+let attempt be withdraw with lend mine, 1000 or else -1
+say "Big withdrawal result: {attempt}"
+
+for each typed in list of "25", "abc", "-5":
+    when parse_amount of typed:
+        is ok amount: say "'{typed}' -> {amount}"
+        is problem why: say "'{typed}' rejected: {why}"
+
+say "Final: {mine's owner} has {mine's balance}, savings has {savings's balance}."

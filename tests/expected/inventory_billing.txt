@@ -1,0 +1,24 @@
+reserved 2 x KB-01, 3 left
+can't reserve 3 x MS-02: only 2 in stock
+unknown product XX-99
+reserved 2 x MS-02, 0 left
+
+INVOICE for Sushant K
+====================================================
+Mechanical keyboard (KB-01)     x2         ₹9,998.00
+Wireless mouse (MS-02)          x2         ₹2,598.00
+Desk setup, 2 h                 x1         ₹1,600.00
+----------------------------------------------------
+Subtotal                                  ₹14,196.00
+After discount                            ₹12,776.40
+GST                                        ₹2,213.35
+TOTAL                                     ₹14,989.75
+
+INVOICE for Walk-in customer
+====================================================
+Wireless mouse (MS-02)          x1         ₹1,299.00
+----------------------------------------------------
+Subtotal                                   ₹1,299.00
+GST                                          ₹233.82
+TOTAL                                      ₹1,532.82
+

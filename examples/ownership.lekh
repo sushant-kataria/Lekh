@@ -1,0 +1,37 @@
+-- ownership.lekh: how Lekh stays memory-safe with three simple words
+--   (nothing)  a task just LOOKS at what you pass   (read-only, shared)
+--   lend       a task may CHANGE your value, then gives it back
+--   give       you hand the value over for good     (you can't use it after)
+
+to total prices as list of number gives number:
+    give back sum of prices
+
+to add_tax changeable prices as list of number, rate as number:
+    for each changeable price in prices:
+        change price to round with price + price * rate, 2
+
+to archive owned as list of number gives text:
+    give back "archived {length of owned} prices"
+
+let changeable prices be list of 100, 250, 40
+say "Total before tax: {total of prices}"
+add_tax with lend prices, 0.18
+say "After tax: {prices}, total {total of prices}"
+
+let backup be copy of prices
+let basket be prices
+say "basket now owns {basket}"
+-- writing `say prices` here would be an Ownership error:
+-- prices was given to basket, and every value has exactly one owner.
+
+say archive with give backup
+-- backup is gone now too; `copy of` is how you keep both.
+
+let changeable fruits be list of "apple", "kiwi"
+let changeable extra be empty list
+for each fruit in fruits:
+    -- adding to `fruits` inside this loop would be an error, so collect first
+    add "{fruit} juice" to extra
+for each drink in extra:
+    add drink to fruits
+say "Fruits and drinks: {join with fruits, ", "}"

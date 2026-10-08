@@ -1,0 +1,4 @@
+-- expect: Unhandled problem
+-- expect: "abc" is not a number
+let n be try "abc" as number
+say n

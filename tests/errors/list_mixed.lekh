@@ -1,0 +1,4 @@
+-- expect: Type mix-up
+-- expect: holds text, so you can't put
+let changeable cart be list of "milk"
+add 3 to cart

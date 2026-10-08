@@ -1,0 +1,6 @@
+-- expect: You can't add to `seen` inside `at the same time`
+-- static
+let changeable seen be empty list
+at the same time:
+    add 1 to seen
+    add 2 to seen

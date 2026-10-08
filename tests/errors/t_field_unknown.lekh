@@ -1,0 +1,4 @@
+-- expect: A `Response` has no field called `stat`
+-- static
+to show_status r as Response:
+    say r's stat

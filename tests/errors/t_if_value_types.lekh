@@ -1,0 +1,4 @@
+-- expect: Both answers of an `if ... then ... otherwise` should be the same type
+-- static
+let n be 4
+let label be if n is greater than 3 then "big" otherwise 0

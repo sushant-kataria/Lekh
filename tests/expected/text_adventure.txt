@@ -1,0 +1,44 @@
+Welcome to the House of Lekh. Find the treasure! (type help)
+== Hall ==
+A dusty hall. A locked door leads east.
+You see: umbrella
+Exits: east, north
+> help
+Try: look, go north, take brass key, use brass key, bag, quit
+> look
+== Hall ==
+A dusty hall. A locked door leads east.
+You see: umbrella
+Exits: east, north
+> go east
+The door is locked.
+> north
+== Kitchen ==
+Smells of old chai.
+You see: biscuit, brass key
+Exits: south
+> take brass key
+Taken: brass key.
+> take spoon
+There is no spoon here.
+> use biscuit
+You don't have a biscuit.
+> south
+== Hall ==
+A dusty hall. A locked door leads east.
+You see: umbrella
+Exits: east, north
+> use brass key
+Click! The east door swings open.
+> bag
+You carry: brass key
+> dance
+I don't understand "dance". Type help.
+> east
+== Study ==
+Books everywhere. A treasure chest sits in the corner!
+You see: treasure
+Exits: west
+> take treasure
+Taken: treasure.
+You found the treasure in 13 moves. You win!

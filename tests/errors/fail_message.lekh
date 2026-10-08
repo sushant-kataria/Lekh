@@ -1,0 +1,3 @@
+-- expect: The program stopped on purpose
+-- expect: Out of stock
+fail "Out of stock"
