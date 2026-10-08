@@ -1,0 +1,12 @@
+-- palindrome.lekh: does a word read the same backwards?
+to palindrome word as text gives truth:
+    let clean be lowercase of (replace with word, " ", "")
+    give back clean is reversed of clean
+
+let samples be list of "racecar", "Level", "hello", "Never odd or even"
+
+for each word in samples:
+    if palindrome of word:
+        say "{word} is a palindrome"
+    otherwise:
+        say "{word} is not a palindrome"

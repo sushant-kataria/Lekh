@@ -1,0 +1,122 @@
+-- Unit tests for the core language.  Run with:  lekh test tests/unit
+record Point:
+    x as number
+    y as number
+
+to Point's plus other as Point gives Point:
+    give back Point with x my x + other's x, y my y + other's y
+
+to Point's move_by dx as number changes me:
+    increase my x by dx
+
+ability Named:
+    to name gives text
+    to greeting gives text:
+        give back "Hi, {me's name}"
+
+record Robot:
+    serial as number
+
+to Robot's name gives text:
+    give back "robot-{my serial}"
+
+Robot can Named
+
+choice Expr:
+    Lit with value as number
+    Add with left as Expr, right as Expr
+    Mul with left as Expr, right as Expr
+
+to evaluate e as Expr gives number:
+    when e:
+        is Lit with v: give back v
+        is Add with a, b: give back (evaluate of a) + (evaluate of b)
+        is Mul with a, b: give back (evaluate of a) * (evaluate of b)
+
+to divide a as number, b as number gives result of number or text:
+    if b is 0: give back problem "divide by zero"
+    give back ok a / b
+
+to half_then_divide a as number, b as number gives result of number or text:
+    let r be try divide with a, b
+    give back ok r / 2
+
+constant GREETING be "hello"
+
+test "arithmetic and integer division":
+    expect 7 div 2 to be 3
+    expect 7 mod 3 to be 1
+    expect 2 + 3 * 4 to be 14
+    expect power with 2, 100 to be 1267650600228229401496703205376
+
+test "text interpolation and methods":
+    let name be "lekh"
+    expect "{name}!" to be "lekh!"
+    expect name's uppercase to be "LEKH"
+    expect name's length to be 4
+    expect "a-b-c" to contain "b"
+
+test "methods on records":
+    let p be Point with x 1, y 2
+    let q be p's plus with (Point with x 10, y 20)
+    expect q's x to be 11
+    let changeable r be Point with x 0, y 0
+    r's move_by with 5
+    expect r's x to be 5
+
+test "abilities with defaults":
+    let r be Robot with serial 7
+    expect r's name to be "robot-7"
+    expect r's greeting to be "Hi, robot-7"
+
+test "recursive choices and when":
+    let e be Add with left (Lit with value 2), right (Mul with left (Lit with value 3), right (Lit with value 4))
+    expect evaluate of e to be 14
+
+test "results and try":
+    expect divide with 1, 0 to be problem
+    expect half_then_divide with 8, 2 to be ok 2
+    expect (half_then_divide with 8, 0) or else -1 to be -1
+
+test "tuples and destructuring":
+    let (a, b) be (1, "one")
+    expect a to be 1
+    expect b to be "one"
+    expect (1, 2) to be (1, 2)
+
+test "lambdas capture copies":
+    let base be 10
+    let add_base be given n: n + base
+    expect add_base with 5 to be 15
+
+test "list forms":
+    let xs be list of 3, 1, 2
+    expect (keep each n in xs where n is greater than 1) to be list of 3, 2
+    expect (turn each n in xs into n * 2) to be list of 6, 2, 4
+    expect (sort each n in xs by n) to be list of 1, 2, 3
+    expect (combine each n in xs into t starting at 0 using t + n) to be 6
+    expect (any n in xs where n is 2) to be true
+    expect (find first n in xs where n is greater than 5) to be nothing
+
+test "ranges, sets and constants":
+    expect range from 1 to 5 by 2 to be list of 1, 3, 5
+    expect set of 1, 2, 2 to be set of 2, 1
+    expect GREETING to be "hello"
+    expect 5 is between 1 and 10 to be true
+
+test "patterns with guards":
+    let changeable seen be empty list
+    for each n in list of -1, 0, 7:
+        when n:
+            is 0: add "zero" to seen
+            is m if m is less than 0: add "negative" to seen
+            otherwise: add "positive" to seen
+    expect seen to be list of "negative", "zero", "positive"
+
+test "cleanup runs at the end of a block":
+    let changeable log be empty list
+    if true:
+        at the end:
+            add "cleanup" to log
+        add "work" to log
+    expect log to be list of "work", "cleanup"

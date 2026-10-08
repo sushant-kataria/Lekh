@@ -1,0 +1,60 @@
+-- concurrency: at the same time, channels, background jobs
+to slow_square n as number gives number:
+    wait 0.05 seconds
+    give back n * n
+
+-- 1. run independent statements at the same time
+let results be a new channel
+at the same time:
+    send (slow_square with 3) to results
+    send (slow_square with 4) to results
+    send (slow_square with 5) to results
+close results
+let changeable got be empty list
+for each r in results:
+    add r to got
+say "squares (any order, sorted): {sorted of got}"
+
+-- 2. a parallel loop; each job gets read-only access to outside values
+let urls be list of "a.example", "b.example", "c.example", "d.example"
+let prefix be "https://"
+let fetched be a new channel
+let started be now
+for each u in urls at the same time:
+    wait 0.1 seconds
+    send "{prefix}{u}" to fetched
+close fetched
+let changeable pages be empty list
+for each p in fetched:
+    add p to pages
+say "fetched {length of pages} pages: {sorted of pages}"
+say "ran in parallel (well under 0.4s): {seconds_since of started is less than 0.35}"
+
+-- 3. background jobs with start / wait for
+let job1 be start slow_square with 6
+let job2 be start slow_square with 7
+say "doing other work while jobs run..."
+let a be wait for job1
+let b be wait for job2
+say "job results: {a} and {b}"
+let jobs be turn each n in range from 1 to 4 into start slow_square with n
+say "all jobs: {wait for jobs}"
+
+-- 4. receive one value at a time
+let inbox be a new channel
+send "hello" to inbox
+send "world" to inbox
+say "received {(receive from inbox) or else "?"} then {(receive from inbox) or else "?"}"
+close inbox
+say "after close, empty channel gives nothing: {(receive from inbox) is nothing}"
+
+-- 5. counting in parallel with a channel instead of shared state
+let tally be a new channel
+for each n from 1 to 20 at the same time:
+    if n mod 3 is 0:
+        send 1 to tally
+close tally
+let changeable count be 0
+for each t in tally:
+    increase count by t
+say "multiples of 3 up to 20: {count}"

@@ -1,0 +1,49 @@
+-- custom error types, propagation with try, cleanup with `at the end`
+choice BankError:
+    NotEnough with short_by as number
+    Frozen with reason as text
+    BadAmount
+
+record Account:
+    owner as text
+    balance as number
+    frozen as truth
+
+to withdraw acc as Account, amount as number gives result of number or BankError:
+    if amount is at most 0: give back problem BadAmount
+    if acc's frozen: give back problem (Frozen with reason "{acc's owner}'s account is frozen")
+    if amount is greater than acc's balance:
+        give back problem (NotEnough with short_by amount - acc's balance)
+    give back ok acc's balance - amount
+
+to pay_bills acc as Account gives result of number or BankError:
+    at the end:
+        say "  (audit log written for {acc's owner})"
+    let after_rent be try withdraw with acc, 500
+    let after_food be try withdraw with (Account with owner acc's owner, balance after_rent, frozen false), 200
+    give back ok after_food
+
+to explain r as result of number or BankError gives text:
+    when r:
+        is ok left: give back "paid, {left} left"
+        is problem (NotEnough with n) if n is greater than 100: give back "far too poor (short by {n})"
+        is problem (NotEnough with n): give back "nearly there (short by {n})"
+        is problem (Frozen with why): give back "blocked: {why}"
+        is problem BadAmount: give back "amount must be positive"
+
+let people be list of (Account with owner "Asha", balance 1000, frozen false), (Account with owner "Ravi", balance 650, frozen false), (Account with owner "Mira", balance 300, frozen false), (Account with owner "Dev", balance 900, frozen true)
+for each p in people:
+    say "{p's owner}: {explain with (pay_bills with p)}"
+say explain with (withdraw with (item 1 of people), -5)
+
+-- plain text problems still work, and `or else` gives a fallback
+to parse_age t as text gives result of number or text:
+    let n be try (t as number)
+    if n is less than 0: give back problem "age can't be negative"
+    give back ok n
+
+for each t in list of "34", "abc", "-2":
+    when parse_age with t:
+        is ok n: say "age {n}"
+        is problem why: say "bad age: {why}"
+say "fallback: {(parse_age with "x") or else 18}"

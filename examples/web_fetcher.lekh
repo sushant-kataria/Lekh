@@ -1,0 +1,66 @@
+-- web_fetcher.lekh: fetch many web pages at the same time and report on them.
+--   lekh run examples/web_fetcher.lekh https://example.com https://www.python.org
+-- With no addresses it uses built-in demo pages (no network needed) that take
+-- 0.3 seconds each, so you can see the jobs really run side by side.
+-- Shows: `for each ... at the same time`, channels, records, results, timing.
+record Report:
+    url as text
+    status as number
+    size as number
+    seconds as number
+    title as text
+
+to demo_page url as text gives result of Response or text:
+    wait 0.3 seconds
+    when url:
+        is "demo://news": give back ok (Response with status 200, body "<title>Daily News</title>" + (repeat_text with "x", 5000), headers empty map)
+        is "demo://shop": give back ok (Response with status 200, body "<title>Shop</title>" + (repeat_text with "y", 1200), headers empty map)
+        is "demo://gone": give back ok (Response with status 404, body "<title>Not Found</title>", headers empty map)
+        otherwise: give back problem "no such demo page"
+
+to fetch url as text gives result of Response or text:
+    if url starts with "demo://":
+        give back demo_page of url
+    give back http_get of url
+
+to title_of html as text gives text:
+    let found be find_groups with html, "<title>(.*?)</title>"
+    if length of found is 0: give back "(no title)"
+    give back first of (first of found)
+
+let given_urls be arguments
+let changeable urls be copy of given_urls
+if length of urls is 0:
+    change urls to list of "demo://news", "demo://shop", "demo://gone", "demo://missing", "ftp://old.example"
+
+let reports be a new channel
+let failures be a new channel
+let started be now
+for each url in urls at the same time:
+    let t0 be now
+    when fetch of url:
+        is ok page:
+            send (Report with url url, status page's status, size length of page's body, seconds seconds_since of t0, title title_of of page's body) to reports
+        is problem why:
+            send "{url}: {why}" to failures
+close reports
+close failures
+let elapsed be seconds_since of started
+
+let changeable done be empty list
+for each r in reports:
+    add r to done
+let ordered be sort each r in done by r's size descending
+
+say "{pad_right with "URL", 16} {pad_left with "STATUS", 6} {pad_left with "BYTES", 7}  TITLE"
+for each r in ordered:
+    say "{pad_right with r's url, 16} {pad_left with (r's status as text), 6} {pad_left with (with_commas of r's size), 7}  {r's title}"
+let changeable problems be empty list
+for each f in failures:
+    add f to problems
+for each p in sorted of problems:
+    say "failed: {p}"
+let ok_count be count each r in done where r's status is between 200 and 299
+say "{ok_count} ok, {length of done - ok_count} bad status, {length of problems} failed"
+if length of given_urls is 0:
+    say "5 pages fetched at the same time (each takes 0.3s): faster than one after another? {elapsed is less than 1.0}"

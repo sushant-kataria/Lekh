@@ -1,0 +1,7 @@
+fib of 24 = 46368
+sum of multiples of 3 up to 200000 = 6666633333
+squares that leave 1 when divided by 7: 14286
+same output: True
+lekh run   (interpreter): 5.16 s
+lekh build (transpiled):  0.30 s
+speed-up: 17.1x

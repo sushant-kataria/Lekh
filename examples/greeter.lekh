@@ -1,0 +1,13 @@
+-- greeter.lekh: reading input with ask, and safe number conversion
+let name be trimmed of ask "What's your name?"
+if name is "":
+    say "Hello, mystery person!"
+otherwise:
+    say "Hello, {name}!"
+
+let answer be ask "How old are you?"
+when answer as number:
+    is ok age:
+        say "Next year you'll be {age + 1}."
+    is problem why:
+        say "Hmm, {why}. Maybe next time!"

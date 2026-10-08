@@ -1,0 +1,6 @@
+-- expect: `try` here would pass `nothing` up
+-- static
+to lookup m as map of text to number, k as text gives result of number or text:
+    let v be try (m at k)
+    give back ok v
+say (lookup with (map of "a" to 1), "a") or else 0

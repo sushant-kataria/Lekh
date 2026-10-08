@@ -1,0 +1,6 @@
+-- expect: Ownership rule
+-- expect: one changer or many readers
+to swap changeable a as list of number, changeable b as list of number:
+    say "swapping"
+let changeable xs be list of 1, 2
+swap with lend xs, lend xs

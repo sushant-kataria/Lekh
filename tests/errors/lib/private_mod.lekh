@@ -1,0 +1,6 @@
+-- a module with one shared and one private task
+share to public_thing gives number:
+    give back 1
+
+to secret gives number:
+    give back 42

@@ -1,0 +1,6 @@
+-- expect: Wrong inputs for a task
+-- expect: lend
+to grow changeable xs as list of number:
+    add 1 to xs
+let changeable nums be list of 1
+grow with nums

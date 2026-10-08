@@ -1,0 +1,16 @@
+2026-10-01 09:12:01 sshd: Failed password for root from 203.0.113.9 port 51022
+2026-10-01 09:12:03 sshd: Failed password for root from 203.0.113.9 port 51023
+2026-10-01 09:12:05 sshd: Failed password for admin from 203.0.113.9 port 51024
+2026-10-01 09:12:07 sshd: Failed password for admin from 203.0.113.9 port 51025
+2026-10-01 09:12:09 sshd: Failed password for ubuntu from 203.0.113.9 port 51026
+2026-10-01 09:15:44 sshd: Accepted publickey for sushant from 192.168.1.20 port 40112
+2026-10-01 09:20:10 sshd: Failed password for sushant from 192.168.1.20 port 40150
+2026-10-01 09:20:15 sshd: Accepted password for sushant from 192.168.1.20 port 40151
+2026-10-01 10:02:31 sshd: Failed password for test from 198.51.100.77 port 60001
+2026-10-01 10:02:33 sshd: Failed password for guest from 198.51.100.77 port 60002
+2026-10-01 10:02:35 sshd: Failed password for oracle from 198.51.100.77 port 60003
+2026-10-01 10:30:00 cron: job backup finished
+2026-10-01 11:45:12 sshd: Accepted password for root from 198.51.100.77 port 60100
+2026-10-01 12:00:00 sudo: sushant : COMMAND=/usr/bin/apt update
+2026-10-01 12:05:09 sudo: deploy : COMMAND=/bin/cat /etc/shadow
+garbage line without structure

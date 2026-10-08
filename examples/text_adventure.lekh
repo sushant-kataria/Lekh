@@ -1,0 +1,102 @@
+-- text_adventure.lekh: a tiny explore-the-house game.
+-- Commands: look, go <direction>, take <thing>, use <thing>, bag, help, quit
+-- Shows: records holding maps, choices for parsed commands, `when` with guards,
+-- changeable game state passed with `lend`, sets, and reading input with `ask`.
+record Room:
+    title as text
+    description as text
+    exits as map of text to text
+    things as set of text
+
+record Game:
+    rooms as map of text to Room
+    here as text
+    bag as set of text
+    door_open as truth
+    moves as number
+
+choice Command:
+    Look
+    Go with direction as text
+    Take with thing as text
+    Use with thing as text
+    Bag
+    Help
+    Quit
+    Unknown with words as text
+
+to parse line as text gives Command:
+    let words be split with (lowercase of trimmed of line), " "
+    let verb be first of words
+    let rest be join with (slice with words, 2, length of words), " "
+    when verb:
+        is "look" or "l": give back Look
+        is "go" if rest is not "": give back Go with direction rest
+        is "north" or "south" or "east" or "west" or "up" or "down": give back Go with direction verb
+        is "take" or "get" if rest is not "": give back Take with thing rest
+        is "use" if rest is not "": give back Use with thing rest
+        is "bag" or "inventory" or "i": give back Bag
+        is "help" or "?": give back Help
+        is "quit" or "q": give back Quit
+        otherwise: give back Unknown with words line
+
+to make_world gives map of text to Room:
+    let hall be Room with title "Hall", description "A dusty hall. A locked door leads east.", exits (map of "north" to "kitchen", "east" to "study"), things (set of "umbrella")
+    let kitchen be Room with title "Kitchen", description "Smells of old chai.", exits (map of "south" to "hall"), things (set of "brass key", "biscuit")
+    let study be Room with title "Study", description "Books everywhere. A treasure chest sits in the corner!", exits (map of "west" to "hall"), things (set of "treasure")
+    give back map of "hall" to hall, "kitchen" to kitchen, "study" to study
+
+to describe game as Game:
+    let room be (game's rooms at game's here) or else (Room with title "?", description "", exits empty map, things empty set)
+    say "== {room's title} =="
+    say room's description
+    if length of room's things is greater than 0:
+        say "You see: {join with (sorted of (room's things as list)), ", "}"
+    say "Exits: {join with (sorted of keys of room's exits), ", "}"
+
+to step changeable game as Game, command as Command gives truth:
+    let changeable room be (game's rooms at game's here) or else (Room with title "?", description "", exits empty map, things empty set)
+    increase game's moves by 1
+    when command:
+        is Look: describe of game
+        is Go with d if d is "east" and game's here is "hall" and not game's door_open:
+            say "The door is locked."
+        is Go with d:
+            when room's exits at d:
+                is some place:
+                    change game's here to place
+                    describe of game
+                is nothing: say "You can't go {d} from here."
+        is Take with thing if room's things contains thing:
+            remove thing from room's things
+            change game's rooms at game's here to room
+            add thing to game's bag
+            say "Taken: {thing}."
+            if thing is "treasure":
+                say "You found the treasure in {game's moves} moves. You win!"
+                give back false
+        is Take with thing: say "There is no {thing} here."
+        is Use with thing if not (game's bag contains thing): say "You don't have a {thing}."
+        is Use with "brass key" if game's here is "hall":
+            change game's door_open to true
+            say "Click! The east door swings open."
+        is Use with "biscuit": say "Crunchy. You feel braver."
+        is Use with thing: say "Nothing happens when you use the {thing}."
+        is Bag:
+            if length of game's bag is 0: say "Your bag is empty."
+            otherwise: say "You carry: {join with (sorted of (game's bag as list)), ", "}"
+        is Help: say "Try: look, go north, take brass key, use brass key, bag, quit"
+        is Quit:
+            say "Bye!"
+            give back false
+        is Unknown with w: say "I don't understand \"{w}\". Type help."
+    give back true
+
+let changeable game be Game with rooms (run make_world), here "hall", bag empty set, door_open false, moves 0
+say "Welcome to the House of Lekh. Find the treasure! (type help)"
+describe of game
+let changeable playing be true
+while playing:
+    let line be ask "> "
+    if line is "": stop
+    change playing to step with lend game, parse of line

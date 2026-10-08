@@ -1,0 +1,6 @@
+-- expect: A `given` task can't change `total`
+-- static
+let changeable total be 0
+let adder be given n:
+    change total to total + n
+adder with 3

@@ -1,0 +1,10 @@
+-- modules.lekh: using tasks from another file
+use "lib/mathtools"
+
+say "7 squared is {square of 7}"
+say "10! is {factorial of 10}"
+say "A circle of radius 3 has area {round with pi * square of 3, 2}"
+
+let scores be list of 72, 88, 95
+say "Average score: {average of scores or else 0}"
+say "Average of nothing: {average of empty list or else 0}"

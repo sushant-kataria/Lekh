@@ -1,0 +1,6 @@
+-- expect: Ownership rule
+-- expect: give back copy of items
+to keep items as list of number gives list of number:
+    give back items
+let nums be list of 1, 2
+say keep of nums

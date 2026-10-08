@@ -1,0 +1,5 @@
+-- expect: A `Task` needs: title, done. Missing: done
+record Task:
+    title as text
+    done as truth
+let t be Task with title "x"

@@ -1,0 +1,8 @@
+Deposited 50. Balance is now 150.
+Withdrawal failed: not enough money: Sushant has 150, asked for 500
+Moved 120 to savings.
+Big withdrawal result: -1
+'25' -> 25
+'abc' rejected: "abc" is not a number
+'-5' rejected: amounts can't be negative
+Final: Sushant has 30, savings has 120.

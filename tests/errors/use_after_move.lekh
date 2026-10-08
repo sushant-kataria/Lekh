@@ -1,0 +1,6 @@
+-- expect: Ownership rule
+-- expect: given away on line 5
+-- expect: copy of cart
+let cart be list of "milk", "bread"
+let basket be cart
+say cart

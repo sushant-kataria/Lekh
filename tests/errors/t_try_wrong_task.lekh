@@ -1,0 +1,6 @@
+-- expect: `try` passes a problem up to the caller, but this task gives back a number
+-- static
+to parse t as text gives number:
+    let n be try (t as number)
+    give back n
+say parse with "4"

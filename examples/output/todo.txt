@@ -1,0 +1,14 @@
+Your list:
+  1. [ ] Buy milk
+  2. [ ] Write the Lekh docs
+  3. [ ] Call Mom
+
+Finished: Buy milk
+Couldn't find a task called 'Walk the dog'.
+Finished: Call Mom
+
+Your list:
+  1. [x] Buy milk
+  2. [ ] Write the Lekh docs
+  3. [x] Call Mom
+1 of 3 tasks left.

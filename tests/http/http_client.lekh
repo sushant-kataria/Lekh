@@ -1,0 +1,17 @@
+-- HTTP client test: the test runner starts a tiny local server and passes its address.
+let base be (first of arguments)
+when http_get of "{base}/hello":
+    is ok r: say "GET status {r's status}, body {r's body}"
+    is problem why: say "GET failed: {why}"
+when http_get of "{base}/missing":
+    is ok r: say "missing page status {r's status}"
+    is problem why: say "GET failed: {why}"
+let order as map of text to anything be map of "item" to "tea", "qty" to 2
+when http_post with "{base}/orders", (to_json of order):
+    is ok r:
+        say "POST status {r's status}"
+        let reply be (from_json of r's body) or else (empty map)
+        say "server saw qty {(json_get with reply, "received.qty") or else 0}"
+    is problem why: say "POST failed: {why}"
+say "bad scheme is a problem: {(http_get of "ftp://example.com") is problem}"
+say "unreachable is a problem: {(http_get of "http://127.0.0.1:1/") is problem}"

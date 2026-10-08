@@ -1,0 +1,30 @@
+max users: 3
+low 1, high 9
+bottom right: 3, -2
+0 is zero
+5 is small
+12 is big even
+13 is big odd
+circle 2
+square 3
+rect 2x5
+got 1 = one
+range: [1, 4, 7, 10]
+countdown: [5, 4, 3, 2, 1]
+i = 10
+i = 5
+i = 0
+multiples of 7 up to 30: 4
+7 div 2 = 3, 7 / 2 = 3.5, 7 mod 2 = 1
+15 is between 10 and 20: true
+big: 1267650600228229401496703205376
+big * 3 = 370370367037037036703703703670
+integer: 42, decimal: 3
+a -> 1
+b -> 2
+colours: set of "green", "red" (size 2)
+processing report
+cleanup for report
+empty name, stopping early
+cleanup for 
+took 1, left [2, 3]

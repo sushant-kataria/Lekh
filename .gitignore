@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*_built.py
+.DS_Store
+*.egg-info/
+dist/
+build/
+.venv/
+
+# files that example programs create when you run them
+todo.json
+expenses.json
+demo_expenses.json

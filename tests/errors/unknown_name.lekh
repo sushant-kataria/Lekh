@@ -1,0 +1,4 @@
+-- expect: Unknown name
+-- expect: Did you mean `greeting`?
+let greeting be "hi"
+say greting

@@ -1,0 +1,41 @@
+-- wordcount.lekh: a small text tool using maps
+
+let text be "The quick brown fox jumps over the lazy dog. The dog sleeps, the fox runs!"
+
+-- clean up: lowercase and strip punctuation
+let changeable clean be lowercase of text
+for each mark in list of ".", ",", "!":
+    change clean to replace with clean, mark, ""
+
+let all_words be words of clean
+say "Words: {length of all_words}"
+say "Letters (no spaces): {length of replace with clean, " ", ""}"
+
+let changeable counts be an empty map
+for each word in all_words:
+    let current be counts at word or else 0
+    change counts at word to current + 1
+
+say "Unique words: {length of counts}"
+for each word in sorted of keys of counts:
+    let n be counts at word or else 0
+    if n is greater than 1:
+        say "  {word}: {n}"
+
+let changeable best be ""
+let changeable best_count be 0
+let changeable longest be ""
+for each word and n in counts:
+    if n is greater than best_count:
+        change best to word
+        change best_count to n
+    if length of word is greater than length of longest:
+        change longest to word
+
+say "Most common word: '{best}' ({best_count} times)"
+say "Longest word: '{longest}'"
+say "Shouting: {uppercase of first of lines of text}"
+say "Backwards: {reversed of "Lekh"}"
+when counts at "cat":
+    is some n: say "cat appears {n} times"
+    is nothing: say "No cats were mentioned."

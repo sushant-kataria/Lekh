@@ -1,0 +1,9 @@
+-- expect: it was created with plain `let`, so it can never change
+record Counter:
+    count as number
+
+to Counter's bump changes me:
+    increase my count by 1
+
+let c be Counter with count 0
+c's bump

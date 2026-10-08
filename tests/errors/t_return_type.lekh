@@ -1,0 +1,6 @@
+-- expect: `full_name` promises to give back text, but this gives back a number
+-- static
+to full_name first as text, last as text gives text:
+    give back length of first
+
+say full_name with "Ada", "Lovelace"

@@ -1,0 +1,103 @@
+-- todo_cli.lekh: a to-do list that lives in a JSON file.
+--   lekh run examples/todo_cli.lekh add "buy milk"
+--   lekh run examples/todo_cli.lekh list
+--   lekh run examples/todo_cli.lekh done 1
+--   lekh run examples/todo_cli.lekh remove 1
+-- With no words after the file name it runs a short demo on a scratch file.
+-- Shows: arguments, files, JSON, records, methods, results with custom errors, `when` on text.
+record Task:
+    id as number
+    title as text
+    done as truth
+
+to Task's line gives text:
+    let box be "[ ]"
+    if my done:
+        give back "{pad_left with (my id as text), 3}. [x] {my title}"
+    give back "{pad_left with (my id as text), 3}. {box} {my title}"
+
+choice TodoError:
+    NoSuchTask with id as number
+    BadNumber with input as text
+    Unknown with command as text
+
+to TodoError's message gives text:
+    when me:
+        is NoSuchTask with id: give back "there is no task number {id}"
+        is BadNumber with input: give back "\"{input}\" is not a task number"
+        is Unknown with command: give back "I don't know the command \"{command}\" (try add, list, done, remove)"
+
+to load path as text gives list of Task:
+    let changeable tasks be empty list
+    let raw be (read_file of path) or else "[]"
+    let data be (from_json of raw) or else (empty list)
+    for each entry in data:
+        let id be (json_get with entry, "id") or else 0
+        let title be (json_get with entry, "title") or else "?"
+        let done be (json_get with entry, "done") or else false
+        add (Task with id id, title title, done done) to tasks
+    give back tasks
+
+to save path as text, tasks as list of Task:
+    write_file with path, to_json with tasks, true
+
+to next_id tasks as list of Task gives number:
+    let ids be turn each t in tasks into t's id
+    if length of ids is 0: give back 1
+    give back (largest of ids) + 1
+
+to parse_id word as text gives result of number or TodoError:
+    when word as integer:
+        is ok n: give back ok n
+        is problem why: give back problem (BadNumber with input word)
+
+to find_index tasks as list of Task, id as number gives result of number or TodoError:
+    for each t and position in tasks:
+        if t's id is id: give back ok position
+    give back problem (NoSuchTask with id id)
+
+to run_command_words words as list of text, path as text gives result of text or TodoError:
+    let changeable tasks be load of path
+    let command be if length of words is 0 then "list" otherwise first of words
+    when command:
+        is "add":
+            let title be join with (slice with words, 2, length of words), " "
+            let task be Task with id next_id of tasks, title title, done false
+            add task to tasks
+            save with path, tasks
+            give back ok "added: {title}"
+        is "list":
+            if length of tasks is 0: give back ok "nothing to do!"
+            let lines be turn each t in tasks into t's line
+            let open be count each t in tasks where not t's done
+            give back ok (join with lines, "\n") + "\n({open} still to do)"
+        is "done":
+            let id be try parse_id of (item 2 of words)
+            let pos be try find_index with tasks, id
+            change item pos of tasks to Task with id id, title (item pos of tasks)'s title, done true
+            save with path, tasks
+            give back ok "completed task {id}"
+        is "remove":
+            let id be try parse_id of (item 2 of words)
+            let pos be try find_index with tasks, id
+            remove item pos from tasks
+            save with path, tasks
+            give back ok "removed task {id}"
+        otherwise:
+            give back problem (Unknown with command command)
+
+to show_outcome outcome as result of text or TodoError:
+    when outcome:
+        is ok text: say text
+        is problem err: say "Sorry: {err's message}"
+
+let words be arguments
+if length of words is greater than 0:
+    show_outcome with (run_command_words with words, "todo.json")
+otherwise:
+    let demo be "/tmp/lekh_todo_demo.json"
+    write_file with demo, "[]"
+    let script be list of (list of "add", "buy", "milk"), (list of "add", "write", "Lekh", "docs"), (list of "add", "call", "mum"), (list of "done", "2"), (list of "remove", "1"), (list of "done", "9"), (list of "done", "two"), (list of "fly"), (list of "list")
+    for each step in script:
+        say "> todo {join with step, " "}"
+        show_outcome with (run_command_words with step, demo)

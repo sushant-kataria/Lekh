@@ -1,0 +1,5 @@
+-- expect: This can't be changed
+-- expect: line 5
+-- expect: let changeable total be
+let total be 10
+change total to 20

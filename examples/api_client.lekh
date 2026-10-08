@@ -1,0 +1,101 @@
+-- api_client.lekh: a small client for a JSON "users and posts" web API.
+-- The client talks through a Transport ability, so the same code can use a
+-- fake in-memory server (the default, works offline, used by the tests) or a
+-- live one:   lekh run examples/api_client.lekh live https://jsonplaceholder.typicode.com
+-- Shows: abilities for dependency injection, generics, JSON, results with
+-- custom error types, `try` propagation, retries, `at the end` cleanup.
+ability Transport:
+    to fetch path as text gives result of Response or text
+    to name gives text
+
+record FakeServer:
+    pages as map of text to text
+
+to FakeServer's fetch path as text gives result of Response or text:
+    when my pages at path:
+        is some body: give back ok (Response with status 200, body body, headers empty map)
+        is nothing:
+            if path is "/flaky": give back problem "connection reset"
+            give back ok (Response with status 404, body "{{}", headers empty map)
+
+to FakeServer's name gives text:
+    give back "fake server"
+
+record LiveServer:
+    base as text
+
+to LiveServer's fetch path as text gives result of Response or text:
+    give back http_get of (my base + path)
+
+to LiveServer's name gives text:
+    give back my base
+
+FakeServer can Transport
+LiveServer can Transport
+
+choice ApiError:
+    Network with reason as text
+    NotFound with path as text
+    BadData with path as text
+
+to ApiError's describe gives text:
+    when me:
+        is Network with reason: give back "network trouble: {reason}"
+        is NotFound with path: give back "{path} was not found (404)"
+        is BadData with path: give back "{path} did not send valid JSON"
+
+record User:
+    id as number
+    name as text
+    city as text
+
+to get_json server as Transport, path as text gives result of anything or ApiError:
+    let changeable attempts be 0
+    let changeable last_reason be ""
+    repeat 3 times:
+        increase attempts by 1
+        when server's fetch of path:
+            is ok response if response's status is 404: give back problem (NotFound with path path)
+            is ok response:
+                when from_json of response's body:
+                    is ok data: give back ok data
+                    is problem why: give back problem (BadData with path path)
+            is problem why: change last_reason to why
+    give back problem (Network with reason "{last_reason} (after {attempts} tries)")
+
+to get_user server as Transport, id as number gives result of User or ApiError:
+    let data be try get_json with server, "/users/{id}"
+    let name be (json_get with data, "name") or else "?"
+    let city be (json_get with data, "address.city") or else "?"
+    give back ok (User with id id, name name, city city)
+
+to post_titles server as Transport, user_id as number gives result of list of text or ApiError:
+    let posts be try get_json with server, "/posts?userId={user_id}"
+    let changeable titles be empty list
+    for each p in posts:
+        add (json_get with p, "title") or else "(untitled)" to titles
+    give back ok titles
+
+to report server as Transport, ids as list of number:
+    say "Talking to the {server's name}"
+    at the end:
+        say "-- done with the {server's name}"
+    for each id in ids:
+        when get_user with server, id:
+            is ok user:
+                let titles be (post_titles with server, id) or else (empty list)
+                say "#{user's id} {user's name} from {user's city}: {length of titles} posts"
+                for each t in (slice with titles, 1, 2):
+                    say "    - {t}"
+            is problem err: say "#{id}: {err's describe}"
+
+let fake be FakeServer with pages (map of "/users/1" to "{{\"id\": 1, \"name\": \"Asha Rao\", \"address\": {{\"city\": \"Pune\"}}}", "/users/2" to "{{\"id\": 2, \"name\": \"Vikram Singh\", \"address\": {{\"city\": \"Jaipur\"}}}", "/users/3" to "this is not json", "/posts?userId=1" to "[{{\"title\": \"Hello Lekh\"}}, {{\"title\": \"Ownership for humans\"}}, {{\"title\": \"Channels\"}}]", "/posts?userId=2" to "[]")
+
+let args be arguments
+if length of args is 2 and (first of args) is "live":
+    report with (LiveServer with base (item 2 of args)), (list of 1, 2)
+otherwise:
+    report with fake, (list of 1, 2, 3, 4)
+    when get_json with fake, "/flaky":
+        is ok data: say "unexpected: {data}"
+        is problem err: say "/flaky: {err's describe}"

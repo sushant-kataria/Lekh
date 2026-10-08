@@ -1,0 +1,5 @@
+-- expect: Ownership rule
+-- expect: while looping over it
+let changeable xs be list of 1, 2, 3
+for each x in xs:
+    add x to xs

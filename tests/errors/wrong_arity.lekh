@@ -1,0 +1,4 @@
+-- expect: needs 1 input (person), but this line gives it 2
+to greet person:
+    say "Hi {person}"
+greet with "a", "b"

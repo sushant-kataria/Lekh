@@ -1,0 +1,4 @@
+-- expect: Possibly missing value
+-- expect: won't print it directly
+let ages be map of "Asha" to 30
+say ages at "Asha"

@@ -1,0 +1,13 @@
+  (audit log written for Asha)
+Asha: paid, 300 left
+  (audit log written for Ravi)
+Ravi: nearly there (short by 50)
+  (audit log written for Mira)
+Mira: far too poor (short by 200)
+  (audit log written for Dev)
+Dev: blocked: Dev's account is frozen
+amount must be positive
+age 34
+bad age: "abc" is not a number
+bad age: age can't be negative
+fallback: 18

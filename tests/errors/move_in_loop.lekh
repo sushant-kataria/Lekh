@@ -1,0 +1,6 @@
+-- expect: Ownership rule
+-- expect: inside a loop
+let names be list of "a", "b"
+let changeable all be empty list
+repeat 2 times:
+    add names to all

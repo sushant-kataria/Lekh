@@ -1,0 +1,10 @@
+-- fizzbuzz.lekh: the classic warm-up
+for each n from 1 to 15:
+    if n mod 15 is 0:
+        say "FizzBuzz"
+    otherwise if n mod 3 is 0:
+        say "Fizz"
+    otherwise if n mod 5 is 0:
+        say "Buzz"
+    otherwise:
+        say n

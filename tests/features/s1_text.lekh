@@ -1,0 +1,24 @@
+-- text methods and number formatting
+let name be "  ada lovelace  "
+let clean be name's trimmed
+say "[{clean's title_case}] [{uppercase of clean}] [{clean's length}]"
+say slice with "programming", 1, 7
+say "{pad_left with "42", 6, "0"}|{pad_right with "ab", 5}|{centered with "hi", 8, "*"}"
+say repeat_text with "=-", 5
+say "banana has {count_of with "banana", "a"} a's"
+say "is '12.5' a number? {is_number of "12.5"}  is 'abc'? {is_number of "abc"}"
+say replace with "2026-10-08", "-", "/"
+say split with "a,b,,c", ","
+say join with (words of "the quick brown fox"), "_"
+say "starts: {"lekh.lekh" starts with "lekh"}, ends: {"photo.png" ends with ".png"}"
+say "position of 'love': {(position with clean, "love") or else 0}"
+say "letter codes: {letter_code of "A"} {letter_from_code of 97}"
+say "{format_number with 3.14159, 2} | {with_commas of 1234567} | {with_commas with 9876.5, 2}"
+say "whole {whole of 7.9}, floor {floor of -2.5}, ceiling {ceiling of 2.1}, round {round with 2.675, 1}"
+say "power {power with 2, 64}, sqrt {sqrt of 144}, hex {hex of 255}, binary {binary of 10}"
+say "smaller {smaller with 3, 9}, larger {larger with "pear", "apple"}, clamp {clamp with 15, 0, 10}"
+say "type_of: {type_of of 3}, {type_of of 2.5}, {type_of of "x"}, {type_of of (list of 1)}"
+say "sine of pi/2 = {sine of (pi / 2)}, log10 of 1000 = {log10 of 1000}"
+say "average {average of (list of 2, 4, 9)}"
+let price be 1499.5
+say "Total: ₹{with_commas with price * 3, 2}"

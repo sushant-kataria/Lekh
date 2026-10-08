@@ -1,0 +1,20 @@
+-- `if ... then ... otherwise` as a value, method calls with `of`, `as list`
+record Counter:
+    hits as number
+
+to Counter's plus extra as number gives number:
+    give back my hits + extra
+
+let scores be list of 35, 50, 90
+for each s in scores:
+    let grade be if s is at least 80 then "A" otherwise if s is at least 50 then "B" otherwise "C"
+    say "{s} -> {grade}"
+let c be Counter with hits 3
+say c's plus of 4
+say c's plus with 10
+let xs be list of 1, 2
+let ys be if length of xs is 2 then xs otherwise list of 0
+say xs
+say ys
+let letters be set of "b", "a"
+say sorted of (letters as list)

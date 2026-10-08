@@ -1,0 +1,63 @@
+-- csv_report.lekh: read a CSV file, skip bad rows, group sales by region and
+-- write a JSON summary.  Shows: files, records, maps, sorting, number formatting, results.
+record Sale:
+    date as text
+    region as text
+    product as text
+    units as number
+    price as number
+
+to Sale's total gives number:
+    give back my units * my price
+
+to parse_row line as text, number as number gives result of Sale or text:
+    let cells be split with line, ","
+    if length of cells is not 5:
+        give back problem "row {number}: expected 5 columns, found {length of cells}"
+    let units be ((item 4 of cells) as number) or else -1
+    if units is less than 0:
+        give back problem "row {number}: units \"{item 4 of cells}\" is not a number"
+    let price be ((item 5 of cells) as number) or else 0
+    give back ok (Sale with date item 1 of cells, region item 2 of cells, product item 3 of cells, units units, price price)
+
+to load_sales path as text gives result of list of Sale or text:
+    let lines be try read_lines of path
+    let changeable sales be empty list
+    for each line and n in lines:
+        if n is 1 or is_blank of line: skip
+        when parse_row with line, n:
+            is ok sale: add sale to sales
+            is problem why: say "  skipping {why}"
+    give back ok sales
+
+say "Reading examples/data/sales.csv ..."
+when load_sales of "examples/data/sales.csv":
+    is problem why:
+        say "Could not load sales: {why}"
+    is ok sales:
+        let changeable by_region be empty map
+        let changeable units_by_product be empty map
+        for each s in sales:
+            change by_region at s's region to ((by_region at s's region) or else 0) + s's total
+            change units_by_product at s's product to ((units_by_product at s's product) or else 0) + s's units
+
+        say ""
+        say "{pad_right with "Region", 10}{pad_left with "Revenue", 14}"
+        say repeat_text with "-", 24
+        let regions be sort each r in keys of by_region by (by_region at r) or else 0 descending
+        for each r in regions:
+            let amount be (by_region at r) or else 0
+            say "{pad_right with r, 10}{pad_left with "₹" + (with_commas of amount), 14}"
+        let grand be combine each s in sales into t starting at 0 using t + s's total
+        say repeat_text with "-", 24
+        say "{pad_right with "Total", 10}{pad_left with "₹" + (with_commas of grand), 14}"
+
+        let best be sort each p in keys of units_by_product by (units_by_product at p) or else 0 descending
+        say ""
+        say "Best seller by units: {first of best} ({(units_by_product at (first of best)) or else 0} units)"
+        let big_orders be keep each s in sales where s's total is at least 10000
+        say "Orders of ₹10,000 or more: {length of big_orders}"
+
+        let summary as map of text to anything be map of "rows" to length of sales, "revenue" to grand, "by_region" to by_region
+        write_file with "/tmp/sales_summary.json", to_json with summary, true
+        say "Summary written to /tmp/sales_summary.json"

@@ -1,0 +1,4 @@
+-- expect: Type mix-up
+-- expect: holds a number, so it can't become
+let changeable score be 0
+change score to "ten"

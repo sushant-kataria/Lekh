@@ -1,0 +1,3 @@
+-- expect: This gives a group of 3 values, but you named 2
+-- static
+let (a, b) be (1, 2, 3)

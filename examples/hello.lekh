@@ -1,0 +1,12 @@
+-- hello.lekh: your first Lekh program
+let name be "Sushant"
+say "Hello, {name}!"
+say "Welcome to Lekh - code that reads like a sentence."
+
+-- values never change unless you say so
+let changeable visits be 1
+increase visits by 1
+say "{name} has visited {visits} times."
+
+let languages be list of "Rust", "Python", "Lekh"
+say "You know {length of languages} languages. The newest is {last of languages}."

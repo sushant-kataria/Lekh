@@ -1,0 +1,7 @@
+-- expect: This can't be changed
+-- expect: only *looks* at that input
+-- expect: changeable items
+to clear items as list of text:
+    remove "x" from items
+let changeable things be list of "x"
+clear with things

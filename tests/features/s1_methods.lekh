@@ -1,0 +1,96 @@
+-- methods, abilities (traits), generics
+record Account:
+    owner as text
+    balance as number
+
+to Account's deposit amount as number changes me:
+    increase my balance by amount
+
+to Account's can_afford price as number gives truth:
+    give back my balance is at least price
+
+to Account's describe gives text:
+    give back "{my owner} has {my balance}"
+
+let changeable acc be Account with owner "Sushant", balance 100
+acc's deposit with 50
+say acc's describe
+say "can afford 120? {acc's can_afford with 120}"
+say "can afford 500? {acc's can_afford with 500}"
+
+ability Shape:
+    to area gives number
+    to label gives text:
+        give back "a shape with area {me's area}"
+
+record Square:
+    side as number
+
+record Circle:
+    radius as number
+
+to Square's area gives number:
+    give back my side * my side
+
+to Circle's area gives number:
+    give back round with 3.14159 * my radius * my radius, 2
+
+to Circle's label gives text:
+    give back "a circle of radius {my radius}"
+
+Square can Shape
+Circle can Shape
+
+to total_area shapes as list of Shape gives number:
+    let changeable sum be 0
+    for each s in shapes:
+        increase sum by s's area
+    give back sum
+
+let shapes as list of Shape be list of (Square with side 2), (Circle with radius 1)
+for each s in shapes:
+    say s's label
+say "total area: {total_area with shapes}"
+
+-- generics
+record Pair of A and B:
+    left as A
+    right as B
+
+to swap p as Pair of A and B gives Pair of B and A:
+    give back Pair with left p's right, right p's left
+
+let p be Pair with left 1, right "one"
+let q be swap with p
+say "swapped: {q's left}, {q's right}"
+
+to first_or items as list of T, fallback as T gives T:
+    if length of items is 0:
+        give back fallback
+    give back item 1 of items
+
+say first_or with (list of 4, 5), 0
+say first_or with (empty list), "none"
+
+choice Tree:
+    Leaf
+    Node with value as number, left as Tree, right as Tree
+
+to Tree's total gives number:
+    when me:
+        is Leaf: give back 0
+        is Node with v, l, r: give back v + l's total + r's total
+
+let tree be Node with value 1, left (Node with value 2, left Leaf, right Leaf), right Leaf
+say "tree total: {tree's total}"
+
+-- a method without inputs, called on its own line, that replaces `me`
+record Gauge:
+    level as number
+
+to Gauge's reset changes me:
+    change me to Gauge with level 0
+
+let changeable g be Gauge with level 9
+g's reset
+say "gauge after reset: {g's level}"

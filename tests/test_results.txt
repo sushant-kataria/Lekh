@@ -1,0 +1,45 @@
+Examples (must run cleanly):
+  PASS  examples/bank.lekh
+  PASS  examples/fizzbuzz.lekh
+  PASS  examples/greeter.lekh
+  PASS  examples/hello.lekh
+  PASS  examples/modules.lekh
+  PASS  examples/ownership.lekh
+  PASS  examples/rust_compare.lekh
+  PASS  examples/shapes.lekh
+  PASS  examples/todo.lekh
+  PASS  examples/wordcount.lekh
+
+Error cases (must fail with a friendly message):
+  PASS  tests/errors/borrowed_return.lekh
+  PASS  tests/errors/change_kind.lekh
+  PASS  tests/errors/compare_kinds.lekh
+  PASS  tests/errors/divide_zero.lekh
+  PASS  tests/errors/equals_sign.lekh
+  PASS  tests/errors/fail_message.lekh
+  PASS  tests/errors/global_change.lekh
+  PASS  tests/errors/immutable.lekh
+  PASS  tests/errors/lend_twice.lekh
+  PASS  tests/errors/list_mixed.lekh
+  PASS  tests/errors/loop_modify.lekh
+  PASS  tests/errors/missing_colon.lekh
+  PASS  tests/errors/missing_value.lekh
+  PASS  tests/errors/missing_value_print.lekh
+  PASS  tests/errors/move_in_loop.lekh
+  PASS  tests/errors/need_lend.lekh
+  PASS  tests/errors/not_exhaustive.lekh
+  PASS  tests/errors/out_of_range.lekh
+  PASS  tests/errors/print_word.lekh
+  PASS  tests/errors/record_missing_field.lekh
+  PASS  tests/errors/shared_param.lekh
+  PASS  tests/errors/type_annotation.lekh
+  PASS  tests/errors/type_mismatch.lekh
+  PASS  tests/errors/unhandled_try.lekh
+  PASS  tests/errors/unknown_name.lekh
+  PASS  tests/errors/use_after_move.lekh
+  PASS  tests/errors/wrong_arity.lekh
+
+REPL:
+  PASS  repl session
+
+38 passed, 0 failed

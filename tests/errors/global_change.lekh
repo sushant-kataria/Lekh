@@ -1,0 +1,5 @@
+-- expect: Tasks can't change top-level variables
+let changeable count be 0
+to bump:
+    increase count by 1
+run bump

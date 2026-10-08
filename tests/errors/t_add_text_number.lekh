@@ -1,0 +1,6 @@
+-- expect: Can't add text and a number
+-- static
+to label n as number gives text:
+    give back "Item " + n
+
+say label with 3

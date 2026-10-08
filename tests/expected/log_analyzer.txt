@@ -1,0 +1,12 @@
+Analysing 16 lines from examples/data/auth.log (alert at 3+ failures)
+
+Failed logins by address:
+  203.0.113.9       5  users: admin, root, ubuntu  <-- over threshold
+  198.51.100.77     3  users: guest, oracle, test  <-- over threshold
+  192.168.1.20      1  users: sushant
+
+Alerts (2):
+  2026-10-01 11:45:12  HIGH  root logged in from 198.51.100.77 by password after 3 failures (possible brute force success)
+  2026-10-01 12:05:09  HIGH  deploy ran `/bin/cat /etc/shadow` (touches a sensitive file)
+
+2 lines were not auth events.

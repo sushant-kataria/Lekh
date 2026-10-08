@@ -1,0 +1,20 @@
+> todo add buy milk
+added: buy milk
+> todo add write Lekh docs
+added: write Lekh docs
+> todo add call mum
+added: call mum
+> todo done 2
+completed task 2
+> todo remove 1
+removed task 1
+> todo done 9
+Sorry: there is no task number 9
+> todo done two
+Sorry: "two" is not a task number
+> todo fly
+Sorry: I don't know the command "fly" (try add, list, done, remove)
+> todo list
+  2. [x] write Lekh docs
+  3. [ ] call mum
+(1 still to do)

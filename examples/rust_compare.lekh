@@ -1,0 +1,29 @@
+-- rust_compare.lekh: the Lekh side of the Rust-vs-Lekh table in DESIGN.md
+
+choice Shape:
+    Circle with radius as number
+    Rect with width as number, height as number
+
+to area shape as Shape gives number:
+    when shape:
+        is Circle with r: give back 3.14159 * r * r
+        is Rect with w, h: give back w * h
+
+to withdraw changeable balance as number, amount as number gives result of number:
+    if amount is greater than balance:
+        give back problem "not enough money: have {balance}, asked {amount}"
+    decrease balance by amount
+    give back ok balance
+
+let shapes be list of Circle with radius 2, Rect with width 3, height 4
+for each shape in shapes:
+    say "Area: {round with area of shape, 2}"
+
+let changeable balance be 100
+when withdraw with lend balance, 30:
+    is ok left: say "Left: {left}"
+    is problem why: say "Failed: {why}"
+
+let ages be map of "Asha" to 30
+let age be ages at "Ravi" or else 0
+say "Ravi is {age}"

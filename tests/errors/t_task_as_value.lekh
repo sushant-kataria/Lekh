@@ -1,0 +1,7 @@
+-- expect: To call a task that takes nothing, write `(run make)`
+-- static
+record Box:
+    items as list of number
+to make gives list of number:
+    give back list of 1, 2
+let b be Box with items make

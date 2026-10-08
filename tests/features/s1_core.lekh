@@ -1,0 +1,84 @@
+-- tuples, patterns with guards, ranges, constants, numbers, cleanup
+constant MAX_USERS be 3
+say "max users: {MAX_USERS}"
+
+to min_max numbers as list of number gives (number, number):
+    give back (smallest of numbers, largest of numbers)
+
+let (low, high) be min_max with list of 4, 9, 1, 7
+say "low {low}, high {high}"
+
+let point be (3, -2)
+when point:
+    is (0, 0): say "origin"
+    is (x, y) if x is greater than 0 and y is less than 0: say "bottom right: {x}, {y}"
+    is (x, y): say "somewhere else"
+
+to classify n as number gives text:
+    when n:
+        is 0: give back "zero"
+        is from 1 to 9: give back "small"
+        is m if m mod 2 is 0: give back "big even"
+        otherwise: give back "big odd"
+
+for each n in list of 0, 5, 12, 13:
+    say "{n} is {classify with n}"
+
+choice Shape:
+    Circle with radius as number
+    Rect with w as number, h as number
+
+let shapes be list of (Circle with radius 2), (Rect with w 3, h 3), (Rect with w 2, h 5)
+for each s in shapes:
+    when s:
+        is Circle with r: say "circle {r}"
+        is Rect with w, h if w is h: say "square {w}"
+        is Rect with w, h: say "rect {w}x{h}"
+
+let maybe_pair be some (1, "one")
+when maybe_pair:
+    is some (n, word): say "got {n} = {word}"
+    is nothing: say "none"
+
+say "range: {range from 1 to 10 by 3}"
+say "countdown: {range from 5 to 1}"
+for each i from 10 to 0 by -5:
+    say "i = {i}"
+
+let changeable found be 0
+for each n from 1 to 100:
+    if n mod 7 is not 0: skip
+    if n is greater than 30: stop
+    increase found by 1
+say "multiples of 7 up to 30: {found}"
+
+say "7 div 2 = {7 div 2}, 7 / 2 = {7 / 2}, 7 mod 2 = {7 mod 2}"
+say "15 is between 10 and 20: {15 is between 10 and 20}"
+say "big: {power with 2, 100}"
+let big be 123456789012345678901234567890
+say "big * 3 = {big * 3}"
+let answer be "42"
+say "integer: {(answer as integer) or else 0}, decimal: {(3 as decimal) or else 0}"
+
+let pairs be list of ("a", 1), ("b", 2)
+for each (name, value) in pairs:
+    say "{name} -> {value}"
+
+let colours be set of "red", "green", "red"
+say "colours: {colours} (size {length of colours})"
+
+to process name as text:
+    at the end:
+        say "cleanup for {name}"
+    if name is "":
+        say "empty name, stopping early"
+        give back
+    say "processing {name}"
+
+process with "report"
+process with ""
+
+let queue be list of 1, 2, 3
+let changeable q be queue
+let next be take first from q
+say "took {next or else 0}, left {q}"

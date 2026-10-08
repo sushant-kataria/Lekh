@@ -1,0 +1,7 @@
+-- expect: The input `fallback` of `pick` should be a number, but here it's text
+-- static
+to pick items as list of T, fallback as T gives T:
+    if length of items is 0: give back fallback
+    give back item 1 of items
+
+say pick with (list of 1, 2), "none"

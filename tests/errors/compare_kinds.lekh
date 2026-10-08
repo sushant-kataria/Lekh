@@ -1,0 +1,5 @@
+-- expect: Type mix-up
+-- expect: can never be equal
+let answer be "5"
+if answer is 5:
+    say "five"

@@ -1,0 +1,6 @@
+-- expect: A background job can't borrow `items`
+-- static
+to fill changeable xs as list of number:
+    add 1 to xs
+let changeable items be list of 1
+let j be start fill with lend items

@@ -1,0 +1,157 @@
+# Lekh roadmap: what's done, what isn't, and what big programs would need
+
+This page is meant to be honest. "Done" means it is implemented **and**
+covered by the test suite (`python3 tests/run_tests.py`). Everything else is
+marked as partial or planned.
+
+## Where Lekh is today (v0.2)
+
+Lekh is a **working prototype**: a checker plus interpreter written in Python
+(about 9,000 lines, no dependencies), and a translator to Python for speed.
+It's good for learning, scripts, command-line tools, data processing, small
+API clients and teaching safe programming. It is **not** ready for
+production services or performance-critical work.
+
+### Done
+
+| Area | What works |
+|---|---|
+| Core language | variables (`let`, `changeable`, `constant`), numbers of any size, decimals, text with `{}` interpolation, truths, `if ... then ... otherwise` values |
+| Control flow | `if`/`otherwise`, `when` with patterns and guards, `repeat`, `while`, `for each` (positions, map entries, groups, ranges with steps), `stop`, `skip`, early `give back` |
+| Data | lists, maps, sets, groups (tuples), records, choices (tagged unions), queues/stacks |
+| Tasks | typed and untyped inputs, `given` lambdas and closures (capturing copies), higher-order tasks, methods, `changes me` |
+| English list operations | `keep each`, `turn each`, `count each`, `find first`, `any`, `every`, `sort each ... by`, `combine each` |
+| Types | gradual static typing with inference, generics (type variables, generic records), abilities (traits) with defaults, `is a` type tests |
+| Safety | ownership with moves, `lend`/`give`/`copy of`, no null (maybe), no ignored errors (result), `try`, exhaustive `when`, no changing a list while looping, data-race-free concurrency |
+| Errors | custom error choices, `try` propagation, `at the end` cleanup, `fail`; friendly messages with fixes, including hints for words from other languages |
+| Standard library | 127 built-in tasks: text, maths, random, lists/maps/sets, regular expressions, files and folders, JSON, dates, environment, arguments, stdin, shell-free commands, HTTP GET/POST |
+| Concurrency | `at the same time`, parallel `for each`, channels, background jobs (`start`/`wait for`) |
+| Modules | `use`, `share` (private by default), projects with `project.json` |
+| Tools | `lekh run/check/test/format/build/new/repl`, `test` blocks with `expect` |
+| Speed | `lekh build` translates to Python: about 17x faster than the interpreter on the benchmark, with identical output |
+| Docs | this guide, reference, cheat sheet and safety guide, with every sample run by the tests |
+
+### Partial: works, with known limits
+
+| Area | Limit |
+|---|---|
+| Static typing | *Gradual*: code without type labels is checked while running, not before. There's no full inference across tasks without labels. |
+| Generics | A type variable can't yet require an ability (`T can Compare` bounds are planned). Abilities can't be generic. |
+| Ownership | Checked by Lekh's own analysis (static where it can, at run time otherwise), not by a proof system like Rust's borrow checker. There are no lifetimes: borrowed values can't be stored inside other values. |
+| Concurrency | Uses threads. Great for waiting on many web requests or files at once; CPU-heavy work doesn't get faster with more cores (Python's GIL). |
+| `lekh build` | Needs the `lekhlib` folder at run time (it's not a standalone binary). `test` blocks are left out of built programs. Rare constructs report "not supported yet" and must use `lekh run`. |
+| Performance | The interpreter walks the syntax tree and checks ownership and types as it goes, so it's slow. On `benchmarks/fib.lekh`: interpreter 5.2 s, `lekh build` 0.30 s, the same algorithm in plain Python 0.02 s. Built code is still about 15x slower than hand-written Python because every operation goes through Lekh's safety checks. |
+| Errors | The checker stops at the first error in a file rather than listing them all. |
+| Sorting records | Use `sort each p in people by p's age` or `sorted_using`; there are no built-in `Compare`/`Show` abilities yet. |
+| Text formatting | `pad_left`, `pad_right`, `format_number` and `with_commas` exist, but there's no format mini-language yet. |
+| Dates | Local time only; no time zones beyond the computer's own. |
+| HTTP | Client only (GET/POST, headers read-only); no custom request headers, other methods or streaming. |
+
+### Designed but not built
+
+These are written up here but not implemented:
+
+* **Ability bounds**: `to biggest xs as list of T gives T where T can Compare:`
+* **Built-in abilities** `Compare` (for `sorted`, `largest`) and `Show` (for `say`).
+* **Iterators**: records that can be used in `for each` by having a `next` task.
+* **List patterns** in `when`: `is list of first, ...rest`.
+* **A bytecode VM** as an alternative to translating to Python (see [DESIGN.md](../DESIGN.md) for the trade-off).
+
+## What large applications would need
+
+Each section says what exists now and what's missing.
+
+### Web server
+
+*Now:* HTTP **client** only (`http_get`, `http_post`), JSON, and concurrency.
+
+*Needed:*
+1. A `serve` statement on top of Python's `http.server`/`asyncio`, e.g.
+   ```text
+   serve on port 8080:
+       on get "/hello/{name}": give back ok "Hello {name}"
+       on post "/orders" with body: ...
+   ```
+2. `Request` and `Response` records, routing with path parameters, middleware
+   (logging, auth) written as abilities.
+3. One isolated job per request, using the existing `at the same time` rules,
+   so handlers can't share mutable state by accident. Shared state would go
+   through channels or a database.
+4. Static files, templates (with automatic HTML escaping), cookies and
+   sessions; TLS through a reverse proxy at first.
+5. Structured logging and graceful shutdown.
+
+### User interfaces
+
+*Now:* text in and out only (`say`, `ask`, `read_all_input`).
+
+*Needed:*
+1. **Terminal UI** first: colours, clearing the screen, reading single keys,
+   simple menus. This is the smallest step.
+2. **Desktop UI** through Tk (it ships with Python): windows, buttons and
+   inputs, with events handled by `given` tasks.
+3. A state model that fits ownership: the app owns one state record, and event
+   handlers get it with `lend`, so there is exactly one place where state changes.
+4. Or a **web UI**: the web server above, plus HTML templates.
+
+### Databases
+
+*Now:* JSON files (`to_json`/`from_json`, `write_file`) and CSV through `split`.
+
+*Needed:*
+1. SQLite through Python's built-in `sqlite3`:
+   `let db be try open_database of "shop.db"`.
+2. **Parameterised queries only**, so SQL injection is impossible by design:
+   `query with db, "select * from items where price < ?", 100`.
+3. Rows turned into records (`list of Item`), checked against the record's fields.
+4. Transactions that roll back automatically on a `problem` (built on
+   `at the end`), and simple migrations.
+5. Later: PostgreSQL/MySQL drivers as optional packages.
+
+### A real compiler
+
+*Now:* `lekh build` translates checked Lekh into Python and reuses Lekh's
+runtime library. It's 17x faster than the interpreter but still runs on CPython.
+
+*Needed for native speed and standalone binaries:*
+1. **Full static typing** for compiled code (no `anything`), so every value has
+   a known layout. The type checker already does most of this when labels are present.
+2. An intermediate representation, then one of:
+   * **Lekh → Rust source**: the ownership rules (move, `lend` = `&mut`,
+     look = `&`, `give` = move) map almost one-to-one onto Rust, and you get
+     Rust's optimiser and real threads. This is the most promising path.
+   * **Lekh → C**: simplest output, but memory management must be generated
+     (reference counting).
+   * **Lekh → WebAssembly**: runs in browsers; pairs well with the web UI plan.
+3. A runtime library in that language: big integers, text, collections,
+   channels, the standard library.
+4. Eventually, Lekh written in Lekh (self-hosting).
+
+### Packages and tooling
+
+| Need | Status |
+|---|---|
+| Package manager (`lekh add <git url>`, versions, lock file) | planned; today modules come from your own project only |
+| Editor support: syntax colouring (VS Code / TextMate grammar) | planned |
+| Language server (errors as you type, go to definition) | planned; it would reuse the checker |
+| Debugger (step through, see variables) | planned; the REPL's `:vars` and `:type` help for now |
+| Documentation generator from comments | planned |
+| Calling Python libraries (`use python "statistics"`) behind a safety boundary | planned |
+
+### Standard library gaps
+
+CSV with quoting, hashing and crypto (`sha256`), compression, time zones,
+logging, command-line flag parsing, a format mini-language, and more HTTP
+methods and request headers.
+
+## Suggested order
+
+1. Ability bounds, plus `Compare`/`Show` (small, and they unlock generic libraries).
+2. SQLite with parameterised queries.
+3. A `serve` web server.
+4. Package manager and editor syntax highlighting.
+5. Terminal UI.
+6. Compiling to Rust for a typed subset.
+
+Contributions are welcome: every feature needs tests in `tests/` and docs
+whose samples pass `python3 tools/docs_check.py`.

@@ -1,0 +1,7 @@
+-- expect: can't be given away inside `at the same time`
+-- static
+let names be list of "a", "b"
+let ch be a new channel
+at the same time:
+    send names to ch
+    say "hi"

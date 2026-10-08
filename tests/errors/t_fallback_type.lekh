@@ -1,0 +1,4 @@
+-- expect: The fallback should be a number
+-- static
+let ages be map of "ann" to 31
+let age be (ages at "bob") or else "unknown"
